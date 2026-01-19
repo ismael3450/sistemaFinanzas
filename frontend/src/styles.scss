@@ -1,0 +1,262 @@
+/* Tailwind CSS */
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+/* PrimeNG Theme */
+@import "primeng/resources/themes/lara-light-blue/theme.css";
+@import "primeng/resources/primeng.css";
+@import "primeicons/primeicons.css";
+@import "primeflex/primeflex.css";
+
+/* Google Fonts */
+@import url('https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap');
+
+/* CSS Variables */
+:root {
+  --primary-color: #3b82f6;
+  --primary-color-text: #ffffff;
+  --surface-ground: #f8fafc;
+  --surface-section: #ffffff;
+  --surface-card: #ffffff;
+  --surface-overlay: #ffffff;
+  --surface-border: #e2e8f0;
+  --text-color: #1e293b;
+  --text-color-secondary: #64748b;
+  --font-family: 'Inter', system-ui, -apple-system, sans-serif;
+}
+
+/* Base Styles */
+* {
+  box-sizing: border-box;
+}
+
+html, body {
+  height: 100%;
+  margin: 0;
+  padding: 0;
+  font-family: var(--font-family);
+  font-size: 14px;
+  color: var(--text-color);
+  background-color: var(--surface-ground);
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+}
+
+/* Scrollbar */
+::-webkit-scrollbar {
+  width: 8px;
+  height: 8px;
+}
+
+::-webkit-scrollbar-track {
+  background: #f1f5f9;
+}
+
+::-webkit-scrollbar-thumb {
+  background: #cbd5e1;
+  border-radius: 4px;
+}
+
+::-webkit-scrollbar-thumb:hover {
+  background: #94a3b8;
+}
+
+/* Links */
+a {
+  color: var(--primary-color);
+  text-decoration: none;
+  
+  &:hover {
+    text-decoration: underline;
+  }
+}
+
+/* PrimeNG Customizations */
+.p-component {
+  font-family: var(--font-family);
+}
+
+.p-button {
+  font-weight: 500;
+  
+  &.p-button-sm {
+    font-size: 0.875rem;
+    padding: 0.5rem 1rem;
+  }
+}
+
+.p-card {
+  border-radius: 0.75rem;
+  box-shadow: 0 1px 3px 0 rgb(0 0 0 / 0.1);
+  
+  .p-card-title {
+    font-size: 1.125rem;
+    font-weight: 600;
+  }
+}
+
+.p-datatable {
+  .p-datatable-header {
+    background: transparent;
+    border: none;
+    padding: 1rem 0;
+  }
+  
+  .p-datatable-thead > tr > th {
+    background: #f8fafc;
+    font-weight: 600;
+    color: #64748b;
+    text-transform: uppercase;
+    font-size: 0.75rem;
+    letter-spacing: 0.05em;
+  }
+  
+  .p-datatable-tbody > tr {
+    &:hover {
+      background: #f1f5f9;
+    }
+  }
+}
+
+.p-dialog {
+  .p-dialog-header {
+    padding: 1.5rem;
+    border-bottom: 1px solid var(--surface-border);
+  }
+  
+  .p-dialog-content {
+    padding: 1.5rem;
+  }
+  
+  .p-dialog-footer {
+    padding: 1rem 1.5rem;
+    border-top: 1px solid var(--surface-border);
+  }
+}
+
+.p-inputtext {
+  &:focus {
+    box-shadow: 0 0 0 2px rgba(59, 130, 246, 0.2);
+  }
+}
+
+.p-dropdown, .p-calendar, .p-inputnumber {
+  width: 100%;
+}
+
+/* Toast customizations */
+.p-toast {
+  .p-toast-message {
+    border-radius: 0.5rem;
+    
+    &.p-toast-message-success {
+      background: #f0fdf4;
+      border-left: 4px solid #22c55e;
+      color: #166534;
+    }
+    
+    &.p-toast-message-error {
+      background: #fef2f2;
+      border-left: 4px solid #ef4444;
+      color: #991b1b;
+    }
+    
+    &.p-toast-message-warn {
+      background: #fffbeb;
+      border-left: 4px solid #f59e0b;
+      color: #92400e;
+    }
+    
+    &.p-toast-message-info {
+      background: #eff6ff;
+      border-left: 4px solid #3b82f6;
+      color: #1e40af;
+    }
+  }
+}
+
+/* Utility Classes */
+.page-container {
+  @apply p-6;
+}
+
+.page-header {
+  @apply flex items-center justify-between mb-6;
+  
+  h1 {
+    @apply text-2xl font-bold text-gray-800;
+  }
+}
+
+.card-container {
+  @apply grid gap-6;
+}
+
+.stat-card {
+  @apply bg-white rounded-xl p-6 shadow-sm border border-gray-100;
+}
+
+.stat-value {
+  @apply text-2xl font-bold text-gray-800;
+}
+
+.stat-label {
+  @apply text-sm text-gray-500 mt-1;
+}
+
+.form-group {
+  @apply mb-4;
+  
+  label {
+    @apply block text-sm font-medium text-gray-700 mb-1;
+  }
+  
+  .error-message {
+    @apply text-xs text-red-500 mt-1;
+  }
+}
+
+.badge {
+  @apply inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium;
+  
+  &.badge-success {
+    @apply bg-green-100 text-green-800;
+  }
+  
+  &.badge-warning {
+    @apply bg-yellow-100 text-yellow-800;
+  }
+  
+  &.badge-danger {
+    @apply bg-red-100 text-red-800;
+  }
+  
+  &.badge-info {
+    @apply bg-blue-100 text-blue-800;
+  }
+}
+
+/* Money formatting */
+.money {
+  font-variant-numeric: tabular-nums;
+}
+
+.money-income {
+  @apply text-green-600;
+}
+
+.money-expense {
+  @apply text-red-600;
+}
+
+/* Responsive */
+@media (max-width: 768px) {
+  .page-container {
+    @apply p-4;
+  }
+  
+  .page-header {
+    @apply flex-col items-start gap-4;
+  }
+}

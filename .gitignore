@@ -1,0 +1,22 @@
+node_modules/
+dist/
+.env
+.env.*
+coverage/
+.DS_Store
+.idea/
+
+# Angular cache
+frontend/.angular/
+.angular/
+
+# Angular
+.angular/
+frontend/.angular/
+# Node
+node_modules/
+# Builds
+dist/
+# Env
+.env
+.env.*
