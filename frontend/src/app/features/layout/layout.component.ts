@@ -33,11 +33,11 @@ interface NavItem {
   template: `
     <div class="min-h-screen bg-gray-50">
       <!-- Sidebar -->
-      <aside 
-        class="fixed left-0 top-0 z-40 h-screen transition-all duration-300 bg-white border-r border-gray-200"
-        [class.w-64]="!sidebarCollapsed()"
-        [class.w-20]="sidebarCollapsed()">
-        
+      <aside
+          class="fixed left-0 top-0 z-40 h-screen transition-all duration-300 bg-white border-r border-gray-200"
+          [class.w-64]="!sidebarCollapsed()"
+          [class.w-20]="sidebarCollapsed()">
+
         <!-- Logo -->
         <div class="h-16 flex items-center justify-between px-4 border-b border-gray-200">
           @if (!sidebarCollapsed()) {
@@ -52,10 +52,10 @@ interface NavItem {
               <i class="pi pi-wallet text-white"></i>
             </div>
           }
-          <button 
-            pRipple
-            class="p-2 rounded-lg hover:bg-gray-100 transition-colors hidden lg:block"
-            (click)="toggleSidebar()">
+          <button
+              pRipple
+              class="p-2 rounded-lg hover:bg-gray-100 transition-colors hidden lg:block"
+              (click)="toggleSidebar()">
             <i class="pi" [class.pi-chevron-left]="!sidebarCollapsed()" [class.pi-chevron-right]="sidebarCollapsed()"></i>
           </button>
         </div>
@@ -63,16 +63,16 @@ interface NavItem {
         <!-- Organization Selector -->
         @if (!sidebarCollapsed() && activeOrg()) {
           <div class="p-4 border-b border-gray-200">
-            <button 
-              pRipple
-              class="w-full flex items-center gap-3 p-3 rounded-lg bg-gray-50 hover:bg-gray-100 transition-colors"
-              (click)="goToOrganizations()">
+            <button
+                pRipple
+                class="w-full flex items-center gap-3 p-3 rounded-lg bg-gray-50 hover:bg-gray-100 transition-colors"
+                (click)="goToOrganizations()">
               <div class="w-10 h-10 bg-primary-100 rounded-lg flex items-center justify-center">
                 <span class="text-primary-600 font-semibold">{{ orgInitials() }}</span>
               </div>
               <div class="flex-1 text-left overflow-hidden">
                 <p class="font-medium text-gray-800 truncate">{{ activeOrg()?.name }}</p>
-                <p class="text-xs text-gray-500">{{ currentRole() }}</p>
+                <p class="text-xs text-gray-500">{{ getRoleLabel(currentRole()) }}</p>
               </div>
               <i class="pi pi-chevron-down text-gray-400"></i>
             </button>
@@ -82,36 +82,39 @@ interface NavItem {
         <!-- Navigation -->
         <nav class="p-4 space-y-1 overflow-y-auto" style="height: calc(100vh - 180px);">
           @for (item of navItems; track item.route) {
-            <a 
-              pRipple
-              [routerLink]="item.route"
-              routerLinkActive="bg-primary-50 text-primary-600 border-primary-500"
-              [routerLinkActiveOptions]="{ exact: item.route === '/dashboard' }"
-              class="flex items-center gap-3 px-3 py-2.5 rounded-lg text-gray-600 hover:bg-gray-100 transition-colors border-l-4 border-transparent"
-              [pTooltip]="sidebarCollapsed() ? item.label : ''"
-              tooltipPosition="right">
-              <i [class]="'pi ' + item.icon + ' text-lg'"></i>
-              @if (!sidebarCollapsed()) {
-                <span class="font-medium">{{ item.label }}</span>
-              }
-            </a>
+            <!-- CORRECCIÓN: Ahora usamos canShowNavItem para filtrar items por rol -->
+            @if (canShowNavItem(item)) {
+              <a
+                  pRipple
+                  [routerLink]="item.route"
+                  routerLinkActive="active-nav-item"
+                  [routerLinkActiveOptions]="{ exact: item.route === '/dashboard' }"
+                  class="flex items-center gap-3 px-3 py-2.5 rounded-lg text-gray-600 hover:bg-gray-100 transition-colors border-l-4 border-transparent"
+                  [pTooltip]="sidebarCollapsed() ? item.label : ''"
+                  tooltipPosition="right">
+                <i [class]="'pi ' + item.icon + ' text-lg'"></i>
+                @if (!sidebarCollapsed()) {
+                  <span class="font-medium">{{ item.label }}</span>
+                }
+              </a>
+            }
           }
         </nav>
       </aside>
 
       <!-- Main Content -->
-      <div 
-        class="transition-all duration-300"
-        [class.ml-64]="!sidebarCollapsed()"
-        [class.ml-20]="sidebarCollapsed()">
-        
+      <div
+          class="transition-all duration-300"
+          [class.ml-64]="!sidebarCollapsed()"
+          [class.ml-20]="sidebarCollapsed()">
+
         <!-- Top Header -->
         <header class="h-16 bg-white border-b border-gray-200 flex items-center justify-between px-6 sticky top-0 z-30">
           <div class="flex items-center gap-4">
-            <button 
-              pRipple
-              class="lg:hidden p-2 rounded-lg hover:bg-gray-100"
-              (click)="toggleSidebar()">
+            <button
+                pRipple
+                class="lg:hidden p-2 rounded-lg hover:bg-gray-100"
+                (click)="toggleSidebar()">
               <i class="pi pi-bars"></i>
             </button>
             <h1 class="text-lg font-semibold text-gray-800">{{ pageTitle() }}</h1>
@@ -126,14 +129,14 @@ interface NavItem {
 
             <!-- User Menu -->
             <div class="relative">
-              <button 
-                pRipple
-                class="flex items-center gap-3 p-2 rounded-lg hover:bg-gray-100"
-                (click)="userMenu.toggle($event)">
-                <p-avatar 
-                  [label]="userInitials()" 
-                  styleClass="bg-primary-100 text-primary-600"
-                  shape="circle">
+              <button
+                  pRipple
+                  class="flex items-center gap-3 p-2 rounded-lg hover:bg-gray-100"
+                  (click)="userMenu.toggle($event)">
+                <p-avatar
+                    [label]="userInitials()"
+                    styleClass="bg-primary-100 text-primary-600"
+                    shape="circle">
                 </p-avatar>
                 @if (!sidebarCollapsed()) {
                   <div class="text-left hidden sm:block">
@@ -159,29 +162,27 @@ interface NavItem {
     :host {
       display: block;
     }
-    
-    .router-link-active {
-      background-color: rgba(59, 130, 246, 0.1);
-      color: #3b82f6;
-      border-left-color: #3b82f6;
+
+    /* CORRECCIÓN: Clase específica para nav activo */
+    .active-nav-item {
+      background-color: rgba(59, 130, 246, 0.1) !important;
+      color: #3b82f6 !important;
+      border-left-color: #3b82f6 !important;
     }
   `]
 })
 export class LayoutComponent {
-  // Inyección de dependencias con inject() - PRIMERO
   private readonly authService = inject(AuthService);
   private readonly orgService = inject(OrganizationService);
   private readonly router = inject(Router);
 
-  // Signals básicos
   sidebarCollapsed = signal(false);
   pageTitle = signal('Dashboard');
 
-  // Propiedades que dependen de los servicios - DESPUÉS
   readonly activeOrg = this.orgService.activeOrganization;
   readonly currentRole = this.orgService.currentRole;
 
-  // Navigation items
+  // Navigation items - Todos los items del menú
   readonly navItems: NavItem[] = [
     { label: 'Dashboard', icon: 'pi-home', route: '/dashboard' },
     { label: 'Transacciones', icon: 'pi-arrow-right-arrow-left', route: '/transactions' },
@@ -193,7 +194,6 @@ export class LayoutComponent {
     { label: 'Configuración', icon: 'pi-cog', route: '/settings' },
   ];
 
-  // User menu items
   readonly userMenuItems: MenuItem[] = [
     { label: 'Mi Perfil', icon: 'pi pi-user', command: () => this.router.navigate(['/settings/profile']) },
     { label: 'Organizaciones', icon: 'pi pi-building', command: () => this.goToOrganizations() },
@@ -201,7 +201,6 @@ export class LayoutComponent {
     { label: 'Cerrar Sesión', icon: 'pi pi-sign-out', command: () => this.logout() }
   ];
 
-  // Computed signals
   userName = computed(() => this.authService.userFullName());
   userInitials = computed(() => this.authService.userInitials());
   userEmail = computed(() => this.authService.currentUser()?.email || '');
@@ -223,11 +222,32 @@ export class LayoutComponent {
     this.authService.logout();
   }
 
+  /**
+   * CORRECCIÓN PRINCIPAL: Este método ahora se usa en el template
+   * Verifica si el usuario tiene el rol necesario para ver el item
+   */
   canShowNavItem(item: NavItem): boolean {
+    // Si no tiene restricción de roles, mostrar a todos
     if (!item.roles || item.roles.length === 0) {
       return true;
     }
+    // Verificar si el rol actual está en la lista de roles permitidos
     const currentRole = this.currentRole();
     return currentRole ? item.roles.includes(currentRole) : false;
+  }
+
+  /**
+   * Obtener etiqueta legible del rol
+   */
+  getRoleLabel(role: string | null): string {
+    if (!role) return '';
+    const labels: Record<string, string> = {
+      OWNER: 'Propietario',
+      ADMIN: 'Administrador',
+      TREASURER: 'Tesorero',
+      MEMBER: 'Miembro',
+      VIEWER: 'Visor'
+    };
+    return labels[role] || role;
   }
 }

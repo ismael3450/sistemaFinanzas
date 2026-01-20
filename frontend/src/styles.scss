@@ -66,7 +66,7 @@ html, body {
 a {
   color: var(--primary-color);
   text-decoration: none;
-  
+
   &:hover {
     text-decoration: underline;
   }
@@ -79,7 +79,7 @@ a {
 
 .p-button {
   font-weight: 500;
-  
+
   &.p-button-sm {
     font-size: 0.875rem;
     padding: 0.5rem 1rem;
@@ -89,7 +89,7 @@ a {
 .p-card {
   border-radius: 0.75rem;
   box-shadow: 0 1px 3px 0 rgb(0 0 0 / 0.1);
-  
+
   .p-card-title {
     font-size: 1.125rem;
     font-weight: 600;
@@ -102,7 +102,7 @@ a {
     border: none;
     padding: 1rem 0;
   }
-  
+
   .p-datatable-thead > tr > th {
     background: #f8fafc;
     font-weight: 600;
@@ -111,7 +111,7 @@ a {
     font-size: 0.75rem;
     letter-spacing: 0.05em;
   }
-  
+
   .p-datatable-tbody > tr {
     &:hover {
       background: #f1f5f9;
@@ -119,19 +119,85 @@ a {
   }
 }
 
+/* ============================================
+   CORRECCIÓN PRINCIPAL: Dialogs con mejor scroll
+   ============================================ */
 .p-dialog {
   .p-dialog-header {
     padding: 1.5rem;
     border-bottom: 1px solid var(--surface-border);
   }
-  
+
   .p-dialog-content {
     padding: 1.5rem;
+    /* CORRECCIÓN: Permitir scroll dentro del dialog */
+    overflow-y: auto;
+    max-height: calc(90vh - 120px);
   }
-  
+
   .p-dialog-footer {
     padding: 1rem 1.5rem;
     border-top: 1px solid var(--surface-border);
+  }
+}
+
+/* ============================================
+   CORRECCIÓN: Dropdowns que no se cierran al scroll
+   ============================================ */
+.p-dropdown-panel {
+  /* Asegurar que el panel se muestre sobre todo */
+  z-index: 9999 !important;
+
+  /* Limitar altura y permitir scroll interno */
+  .p-dropdown-items-wrapper {
+    max-height: 300px !important;
+    overflow-y: auto !important;
+  }
+}
+
+/* Calendar panel también necesita z-index alto */
+.p-datepicker {
+  z-index: 9999 !important;
+}
+
+/* Menu popup */
+.p-menu-overlay {
+  z-index: 9999 !important;
+}
+
+/* ============================================
+   CORRECCIÓN: Color Picker mejorado
+   ============================================ */
+.p-colorpicker {
+  .p-colorpicker-preview {
+    width: 2.5rem;
+    height: 2.5rem;
+    border-radius: 0.5rem;
+  }
+}
+
+.p-colorpicker-panel {
+  z-index: 9999 !important;
+}
+
+/* Input de color nativo mejorado */
+input[type="color"] {
+  -webkit-appearance: none;
+  border: none;
+  cursor: pointer;
+
+  &::-webkit-color-swatch-wrapper {
+    padding: 0;
+  }
+
+  &::-webkit-color-swatch {
+    border: 2px solid #e5e7eb;
+    border-radius: 0.5rem;
+  }
+
+  &::-moz-color-swatch {
+    border: 2px solid #e5e7eb;
+    border-radius: 0.5rem;
   }
 }
 
@@ -147,27 +213,29 @@ a {
 
 /* Toast customizations */
 .p-toast {
+  z-index: 10000 !important;
+
   .p-toast-message {
     border-radius: 0.5rem;
-    
+
     &.p-toast-message-success {
       background: #f0fdf4;
       border-left: 4px solid #22c55e;
       color: #166534;
     }
-    
+
     &.p-toast-message-error {
       background: #fef2f2;
       border-left: 4px solid #ef4444;
       color: #991b1b;
     }
-    
+
     &.p-toast-message-warn {
       background: #fffbeb;
       border-left: 4px solid #f59e0b;
       color: #92400e;
     }
-    
+
     &.p-toast-message-info {
       background: #eff6ff;
       border-left: 4px solid #3b82f6;
@@ -176,14 +244,16 @@ a {
   }
 }
 
-/* Utility Classes */
+/* ============================================
+   Utility Classes
+   ============================================ */
 .page-container {
   @apply p-6;
 }
 
 .page-header {
   @apply flex items-center justify-between mb-6;
-  
+
   h1 {
     @apply text-2xl font-bold text-gray-800;
   }
@@ -207,11 +277,11 @@ a {
 
 .form-group {
   @apply mb-4;
-  
+
   label {
     @apply block text-sm font-medium text-gray-700 mb-1;
   }
-  
+
   .error-message {
     @apply text-xs text-red-500 mt-1;
   }
@@ -219,19 +289,19 @@ a {
 
 .badge {
   @apply inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium;
-  
+
   &.badge-success {
     @apply bg-green-100 text-green-800;
   }
-  
+
   &.badge-warning {
     @apply bg-yellow-100 text-yellow-800;
   }
-  
+
   &.badge-danger {
     @apply bg-red-100 text-red-800;
   }
-  
+
   &.badge-info {
     @apply bg-blue-100 text-blue-800;
   }
@@ -250,13 +320,99 @@ a {
   @apply text-red-600;
 }
 
-/* Responsive */
+/* ============================================
+   Navigation active state
+   ============================================ */
+.active-nav-item {
+  background-color: rgba(59, 130, 246, 0.1) !important;
+  color: #3b82f6 !important;
+  border-left-color: #3b82f6 !important;
+}
+
+/* ============================================
+   TreeTable improvements
+   ============================================ */
+.p-treetable {
+  .p-treetable-thead > tr > th {
+    background: #f8fafc;
+    font-weight: 600;
+    color: #64748b;
+    text-transform: uppercase;
+    font-size: 0.75rem;
+    letter-spacing: 0.05em;
+  }
+
+  .p-treetable-tbody > tr {
+    &:hover {
+      background: #f1f5f9;
+    }
+  }
+
+  .p-treetable-toggler {
+    width: 1.5rem;
+    height: 1.5rem;
+  }
+}
+
+/* ============================================
+   Responsive
+   ============================================ */
 @media (max-width: 768px) {
   .page-container {
     @apply p-4;
   }
-  
+
   .page-header {
     @apply flex-col items-start gap-4;
+  }
+
+  .p-dialog {
+    width: 95vw !important;
+    max-width: 95vw !important;
+  }
+}
+
+/* ============================================
+   Select Button improvements
+   ============================================ */
+.p-selectbutton {
+  .p-button {
+    flex: 1;
+    justify-content: center;
+  }
+}
+
+/* ============================================
+   InputNumber full width fix
+   ============================================ */
+.p-inputnumber {
+  &.w-full {
+    .p-inputnumber-input {
+      width: 100%;
+    }
+  }
+}
+
+/* ============================================
+   Tab View improvements
+   ============================================ */
+.p-tabview {
+  .p-tabview-nav {
+    border-bottom: 2px solid #e2e8f0;
+
+    .p-tabview-nav-link {
+      border: none;
+      border-bottom: 2px solid transparent;
+      margin-bottom: -2px;
+
+      &:not(.p-disabled):focus {
+        box-shadow: none;
+      }
+    }
+
+    .p-highlight .p-tabview-nav-link {
+      border-bottom-color: var(--primary-color);
+      color: var(--primary-color);
+    }
   }
 }
