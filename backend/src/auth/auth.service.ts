@@ -9,7 +9,14 @@ import { JwtService } from '@nestjs/jwt';
 import * as argon2 from 'argon2';
 import { v4 as uuidv4 } from 'uuid';
 import { PrismaService } from '../prisma/prisma.service';
-import { RegisterDto, LoginDto, AuthResponseDto, UserResponseDto } from './dto';
+import {
+  RegisterDto,
+  LoginDto,
+  AuthResponseDto,
+  UserResponseDto,
+  UpdateProfileDto,
+  ChangePasswordDto,
+} from './dto';
 import { AuditService } from '../audit/audit.service';
 
 @Injectable()
@@ -203,6 +210,91 @@ export class AuthService {
         role: m.role,
       })),
     } as any;
+  }
+
+  async updateProfile(
+      userId: string,
+      dto: UpdateProfileDto,
+  ): Promise<UserResponseDto> {
+    const existingUser = await this.prisma.user.findUnique({
+      where: { id: userId },
+    });
+
+    if (!existingUser) {
+      throw new UnauthorizedException('User not found');
+    }
+
+    const user = await this.prisma.user.update({
+      where: { id: userId },
+      data: {
+        firstName: dto.firstName,
+        lastName: dto.lastName,
+        phone: dto.phone,
+        avatarUrl: dto.avatarUrl,
+      },
+    });
+
+    await this.auditService.log({
+      action: 'UPDATE',
+      module: 'auth',
+      entityType: 'User',
+      entityId: userId,
+      userId,
+      oldValues: {
+        firstName: existingUser.firstName,
+        lastName: existingUser.lastName,
+        phone: existingUser.phone ?? undefined,
+        avatarUrl: existingUser.avatarUrl ?? undefined,
+      },
+      newValues: {
+        firstName: user.firstName,
+        lastName: user.lastName,
+        phone: user.phone ?? undefined,
+        avatarUrl: user.avatarUrl ?? undefined,
+      },
+    });
+
+    return this.mapUserToResponse(user);
+  }
+
+  async changePassword(
+      userId: string,
+      dto: ChangePasswordDto,
+  ): Promise<{ message: string }> {
+    const user = await this.prisma.user.findUnique({
+      where: { id: userId },
+    });
+
+    if (!user) {
+      throw new UnauthorizedException('User not found');
+    }
+
+    const isPasswordValid = await argon2.verify(
+        user.password,
+        dto.currentPassword,
+    );
+
+    if (!isPasswordValid) {
+      throw new BadRequestException('Current password is incorrect');
+    }
+
+    const hashedPassword = await argon2.hash(dto.newPassword);
+
+    await this.prisma.user.update({
+      where: { id: userId },
+      data: { password: hashedPassword },
+    });
+
+    await this.auditService.log({
+      action: 'UPDATE',
+      module: 'auth',
+      entityType: 'User',
+      entityId: userId,
+      userId,
+      newValues: { passwordChanged: true },
+    });
+
+    return { message: 'Password updated' };
   }
 
   private async generateTokens(

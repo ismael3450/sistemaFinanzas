@@ -7,6 +7,7 @@ import {
   HttpCode,
   HttpStatus,
   Req,
+  Patch,
 } from '@nestjs/common';
 import {
   ApiTags,
@@ -23,6 +24,8 @@ import {
   RefreshTokenDto,
   AuthResponseDto,
   UserResponseDto,
+  UpdateProfileDto,
+  ChangePasswordDto,
 } from './dto';
 import { JwtAuthGuard, JwtRefreshGuard } from './guards';
 import { Public, CurrentUser } from '../common/decorators';
@@ -108,5 +111,35 @@ export class AuthController {
     @CurrentUser('id') userId: string,
   ): Promise<UserResponseDto> {
     return this.authService.getCurrentUser(userId);
+  }
+
+  @UseGuards(JwtAuthGuard)
+  @Patch('me')
+  @ApiBearerAuth('JWT-auth')
+  @ApiOperation({ summary: 'Update current user profile' })
+  @ApiResponse({
+    status: 200,
+    description: 'Profile updated successfully',
+    type: UserResponseDto,
+  })
+  async updateProfile(
+      @CurrentUser('id') userId: string,
+      @Body() dto: UpdateProfileDto,
+  ): Promise<UserResponseDto> {
+    return this.authService.updateProfile(userId, dto);
+  }
+
+  @UseGuards(JwtAuthGuard)
+  @Post('change-password')
+  @HttpCode(HttpStatus.OK)
+  @ApiBearerAuth('JWT-auth')
+  @ApiOperation({ summary: 'Change current user password' })
+  @ApiBody({ type: ChangePasswordDto })
+  @ApiResponse({ status: 200, description: 'Password updated successfully' })
+  async changePassword(
+      @CurrentUser('id') userId: string,
+      @Body() dto: ChangePasswordDto,
+  ): Promise<{ message: string }> {
+    return this.authService.changePassword(userId, dto);
   }
 }

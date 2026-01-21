@@ -20,7 +20,8 @@ import { MoneyPipe } from '../../shared/pipes';
 import {
   PeriodSummary,
   CategoryReport,
-  TrendsReport
+  TrendsReport,
+  ReportQuery
 } from '../../core/models';
 
 @Component({
@@ -45,19 +46,19 @@ import {
       <div class="page-header">
         <h1>Reportes</h1>
         <div class="flex gap-2">
-          <p-button 
-            icon="pi pi-file-pdf" 
-            label="Exportar PDF"
-            severity="secondary"
-            [outlined]="true"
-            (onClick)="exportPDF()">
+          <p-button
+              icon="pi pi-file-pdf"
+              label="Exportar PDF"
+              severity="secondary"
+              [outlined]="true"
+              (onClick)="exportReport('pdf')">
           </p-button>
-          <p-button 
-            icon="pi pi-file-excel" 
-            label="Exportar Excel"
-            severity="secondary"
-            [outlined]="true"
-            (onClick)="exportExcel()">
+          <p-button
+              icon="pi pi-file-excel"
+              label="Exportar Excel"
+              severity="secondary"
+              [outlined]="true"
+              (onClick)="exportReport('xlsx')">
           </p-button>
         </div>
       </div>
@@ -67,40 +68,40 @@ import {
         <div class="flex flex-wrap items-end gap-4">
           <div class="form-group mb-0">
             <label>Fecha Inicio</label>
-            <p-calendar 
-              [(ngModel)]="startDate"
-              dateFormat="dd/mm/yy"
-              [showIcon]="true"
-              appendTo="body"
-              styleClass="w-48">
+            <p-calendar
+                [(ngModel)]="startDate"
+                dateFormat="dd/mm/yy"
+                [showIcon]="true"
+                appendTo="body"
+                styleClass="w-48">
             </p-calendar>
           </div>
           <div class="form-group mb-0">
             <label>Fecha Fin</label>
-            <p-calendar 
-              [(ngModel)]="endDate"
-              dateFormat="dd/mm/yy"
-              [showIcon]="true"
-              appendTo="body"
-              styleClass="w-48">
+            <p-calendar
+                [(ngModel)]="endDate"
+                dateFormat="dd/mm/yy"
+                [showIcon]="true"
+                appendTo="body"
+                styleClass="w-48">
             </p-calendar>
           </div>
           <div class="form-group mb-0">
             <label>Período Rápido</label>
-            <p-dropdown 
-              [options]="quickPeriods"
-              [(ngModel)]="selectedPeriod"
-              optionLabel="label"
-              optionValue="value"
-              appendTo="body"
-              (onChange)="onQuickPeriodChange()"
-              styleClass="w-48">
+            <p-dropdown
+                [options]="quickPeriods"
+                [(ngModel)]="selectedPeriod"
+                optionLabel="label"
+                optionValue="value"
+                appendTo="body"
+                (onChange)="onQuickPeriodChange()"
+                styleClass="w-48">
             </p-dropdown>
           </div>
-          <p-button 
-            icon="pi pi-search" 
-            label="Aplicar"
-            (onClick)="loadReports()">
+          <p-button
+              icon="pi pi-search"
+              label="Aplicar"
+              (onClick)="loadReports()">
           </p-button>
         </div>
       </p-card>
@@ -137,7 +138,7 @@ import {
           </div>
           <div class="stat-card">
             <p class="stat-label">Balance Neto</p>
-            <p class="stat-value" 
+            <p class="stat-value"
                [class.text-green-600]="getNetValue() >= 0"
                [class.text-red-600]="getNetValue() < 0">
               {{ summary()!.netBalance | money:currency() }}
@@ -160,12 +161,12 @@ import {
               @if (categoryReport()?.incomeByCategory?.length) {
                 <div class="mb-4">
                   <apx-chart
-                    [series]="incomeChartData().series"
-                    [chart]="pieChartOptions.chart"
-                    [labels]="incomeChartData().labels"
-                    [colors]="incomeChartData().colors"
-                    [legend]="pieChartOptions.legend"
-                    [dataLabels]="pieChartOptions.dataLabels">
+                      [series]="incomeChartData().series"
+                      [chart]="pieChartOptions.chart"
+                      [labels]="incomeChartData().labels"
+                      [colors]="incomeChartData().colors"
+                      [legend]="pieChartOptions.legend"
+                      [dataLabels]="pieChartOptions.dataLabels">
                   </apx-chart>
                 </div>
                 <p-table [value]="categoryReport()!.incomeByCategory" styleClass="p-datatable-sm">
@@ -197,12 +198,12 @@ import {
               @if (categoryReport()?.expenseByCategory?.length) {
                 <div class="mb-4">
                   <apx-chart
-                    [series]="expenseChartData().series"
-                    [chart]="pieChartOptions.chart"
-                    [labels]="expenseChartData().labels"
-                    [colors]="expenseChartData().colors"
-                    [legend]="pieChartOptions.legend"
-                    [dataLabels]="pieChartOptions.dataLabels">
+                      [series]="expenseChartData().series"
+                      [chart]="pieChartOptions.chart"
+                      [labels]="expenseChartData().labels"
+                      [colors]="expenseChartData().colors"
+                      [legend]="pieChartOptions.legend"
+                      [dataLabels]="pieChartOptions.dataLabels">
                   </apx-chart>
                 </div>
                 <p-table [value]="categoryReport()!.expenseByCategory" styleClass="p-datatable-sm">
@@ -236,13 +237,13 @@ import {
           <p-card>
             @if (trends()?.monthlyTrends?.length) {
               <apx-chart
-                [series]="trendsChartData().series"
-                [chart]="trendsChartOptions.chart"
-                [xaxis]="trendsChartData().xaxis"
-                [stroke]="trendsChartOptions.stroke"
-                [colors]="trendsChartOptions.colors"
-                [legend]="trendsChartOptions.legend"
-                [dataLabels]="trendsChartOptions.dataLabels">
+                  [series]="trendsChartData().series"
+                  [chart]="trendsChartOptions.chart"
+                  [xaxis]="trendsChartData().xaxis"
+                  [stroke]="trendsChartOptions.stroke"
+                  [colors]="trendsChartOptions.colors"
+                  [legend]="trendsChartOptions.legend"
+                  [dataLabels]="trendsChartOptions.dataLabels">
               </apx-chart>
             } @else {
               <div class="text-center py-12 text-gray-500">
@@ -263,9 +264,11 @@ export class ReportsComponent implements OnInit {
   private readonly messageService = inject(MessageService);
 
   loading = signal(false);
-  summary = signal<PeriodSummary | null>(null);
-  categoryReport = signal<CategoryReport | null>(null);
-  trends = signal<TrendsReport | null>(null);
+
+  // Usar los signals del servicio directamente
+  readonly summary = this.reportService.summary;
+  readonly categoryReport = this.reportService.categoryReport;
+  readonly trends = this.reportService.trendsReport;
 
   // Filtros
   startDate: Date = new Date(new Date().getFullYear(), new Date().getMonth(), 1);
@@ -392,14 +395,14 @@ export class ReportsComponent implements OnInit {
 
   loadReports(): void {
     this.loading.set(true);
-    const query = {
+    const query: ReportQuery = {
       startDate: this.startDate,
       endDate: this.endDate
     };
 
-    // Cargar resumen
-    this.reportService.getPeriodSummary(query).subscribe({
-      next: (data) => this.summary.set(data),
+    // Cargar resumen - el servicio usa getSummary
+    this.reportService.getSummary(query).subscribe({
+      next: () => console.log('Resumen cargado'),
       error: () => this.messageService.add({
         severity: 'error',
         summary: 'Error',
@@ -409,14 +412,14 @@ export class ReportsComponent implements OnInit {
 
     // Cargar reporte por categoría
     this.reportService.getCategoryReport(query).subscribe({
-      next: (data) => this.categoryReport.set(data),
-      error: () => {}
+      next: () => console.log('Reporte por categoría cargado'),
+      error: () => console.error('Error cargando reporte por categoría')
     });
 
-    // Cargar tendencias
-    this.reportService.getTrends(query).subscribe({
-      next: (data) => {
-        this.trends.set(data);
+    // Cargar tendencias - el servicio usa getTrendsReport
+    this.reportService.getTrendsReport(query).subscribe({
+      next: () => {
+        console.log('Tendencias cargadas');
         this.loading.set(false);
       },
       error: () => this.loading.set(false)
@@ -424,60 +427,27 @@ export class ReportsComponent implements OnInit {
   }
 
   getNetValue(): number {
-    const summary = this.summary();
-    if (!summary) return 0;
-    return parseFloat(summary.netBalance);
+    const summaryData = this.summary();
+    if (!summaryData) return 0;
+    return parseFloat(summaryData.netBalance);
   }
 
-  exportPDF(): void {
-    this.exportService.exportPDF({
+  /**
+   * Exportar reporte usando el ExportService existente
+   * El servicio usa exportTransactions con formato
+   */
+  exportReport(format: 'csv' | 'xlsx' | 'pdf'): void {
+    this.exportService.exportTransactions({
       startDate: this.startDate,
-      endDate: this.endDate
-    }).subscribe({
-      next: (blob) => {
-        this.downloadFile(blob, 'reporte.pdf');
-        this.messageService.add({
-          severity: 'success',
-          summary: 'Éxito',
-          detail: 'PDF exportado correctamente'
-        });
-      },
-      error: () => this.messageService.add({
-        severity: 'error',
-        summary: 'Error',
-        detail: 'No se pudo exportar el PDF'
-      })
+      endDate: this.endDate,
+      format
     });
-  }
 
-  exportExcel(): void {
-    this.exportService.exportXLSX({
-      startDate: this.startDate,
-      endDate: this.endDate
-    }).subscribe({
-      next: (blob) => {
-        this.downloadFile(blob, 'reporte.xlsx');
-        this.messageService.add({
-          severity: 'success',
-          summary: 'Éxito',
-          detail: 'Excel exportado correctamente'
-        });
-      },
-      error: () => this.messageService.add({
-        severity: 'error',
-        summary: 'Error',
-        detail: 'No se pudo exportar el Excel'
-      })
+    this.messageService.add({
+      severity: 'success',
+      summary: 'Exportando',
+      detail: `Generando archivo ${format.toUpperCase()}...`
     });
-  }
-
-  private downloadFile(blob: Blob, filename: string): void {
-    const url = window.URL.createObjectURL(blob);
-    const a = document.createElement('a');
-    a.href = url;
-    a.download = filename;
-    a.click();
-    window.URL.revokeObjectURL(url);
   }
 
   private generateColors(count: number): string[] {

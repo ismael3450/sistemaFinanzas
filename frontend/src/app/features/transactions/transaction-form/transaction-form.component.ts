@@ -166,7 +166,7 @@ import { TransactionType, Category, Account, PaymentMethod } from '../../../core
           </div>
 
           <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
-            <!-- Category - CORREGIDO: Ahora muestra todas las categorías filtradas correctamente -->
+            <!-- Category -->
             <div class="form-group">
               <label for="categoryId">Categoría</label>
               <p-dropdown
@@ -200,7 +200,7 @@ import { TransactionType, Category, Account, PaymentMethod } from '../../../core
               </small>
             </div>
 
-            <!-- Payment Method - CORREGIDO: Ahora muestra los métodos de pago -->
+            <!-- Payment Method -->
             <div class="form-group">
               <label for="paymentMethodId">Método de Pago</label>
               <p-dropdown
@@ -270,7 +270,7 @@ import { TransactionType, Category, Account, PaymentMethod } from '../../../core
       .p-dropdown-panel {
         max-height: 300px !important;
       }
-      
+
       .p-dropdown-items-wrapper {
         max-height: 250px !important;
         overflow-y: auto !important;
@@ -312,7 +312,8 @@ export class TransactionFormComponent implements OnInit {
     { label: 'Transferencia', value: 'TRANSFER', icon: 'pi-arrows-h' }
   ];
 
-  // CORRECCIÓN: Usar signals directamente de los servicios
+  // Usar signals directamente de los servicios
+  // Los servicios ya manejan internamente el response.data
   readonly accounts = this.accountService.activeAccounts;
   readonly categories = this.categoryService.activeCategories;
   readonly paymentMethods = this.paymentMethodService.activePaymentMethods;
@@ -320,19 +321,18 @@ export class TransactionFormComponent implements OnInit {
   currency = computed(() => this.orgService.activeOrganization()?.currency || 'USD');
 
   /**
-   * CORRECCIÓN: Filtrar categorías según el tipo de transacción
+   * Filtrar categorías según el tipo de transacción
    * Las categorías con type='BOTH' aparecen en ingresos y egresos
    */
   filteredCategories = computed(() => {
     const type = this.form?.get('type')?.value;
     const allCategories = this.categories();
 
-    // Debug
+    // Debug - remover en producción
     console.log('Tipo seleccionado:', type);
     console.log('Total categorías:', allCategories.length);
 
     if (!type || type === 'TRANSFER') {
-      // Para transferencias, mostrar todas las categorías
       return allCategories;
     }
 
@@ -361,21 +361,21 @@ export class TransactionFormComponent implements OnInit {
   });
 
   constructor() {
-    // Efecto para monitorear cambios en los datos
+    // Efecto para monitorear cambios en los datos (debug)
     effect(() => {
       const cats = this.categories();
       const methods = this.paymentMethods();
       const accts = this.accounts();
 
       console.log('=== Datos cargados ===');
-      console.log('Categorías:', cats.length, cats);
-      console.log('Métodos de pago:', methods.length, methods);
-      console.log('Cuentas:', accts.length, accts);
+      console.log('Categorías:', cats.length);
+      console.log('Métodos de pago:', methods.length);
+      console.log('Cuentas:', accts.length);
     });
   }
 
   ngOnInit(): void {
-    // CORRECCIÓN: Cargar datos primero y esperar a que terminen
+    // Cargar datos - los servicios internamente actualizan sus signals
     this.loadAllData();
 
     // Check if editing
@@ -390,24 +390,25 @@ export class TransactionFormComponent implements OnInit {
   }
 
   /**
-   * CORRECCIÓN: Cargar todos los datos necesarios
+   * Cargar todos los datos necesarios
+   * Los servicios usan tap() para actualizar sus signals internos
    */
   private loadAllData(): void {
-    // Cargar cuentas
+    // Cargar cuentas - el servicio actualiza _accounts signal internamente
     this.accountService.getAll().subscribe({
-      next: (accounts) => console.log('Cuentas cargadas:', accounts.length),
+      next: () => console.log('Cuentas cargadas correctamente'),
       error: (err) => console.error('Error cargando cuentas:', err)
     });
 
-    // Cargar categorías - IMPORTANTE: incluir inactivas = false
+    // Cargar categorías - el servicio actualiza _categories signal internamente
     this.categoryService.getAll(false).subscribe({
-      next: (categories) => console.log('Categorías cargadas:', categories.length),
+      next: () => console.log('Categorías cargadas correctamente'),
       error: (err) => console.error('Error cargando categorías:', err)
     });
 
-    // Cargar métodos de pago
+    // Cargar métodos de pago - el servicio actualiza _paymentMethods signal internamente
     this.paymentMethodService.getAll().subscribe({
-      next: (methods) => console.log('Métodos de pago cargados:', methods.length),
+      next: () => console.log('Métodos de pago cargados correctamente'),
       error: (err) => console.error('Error cargando métodos de pago:', err)
     });
 
@@ -416,7 +417,10 @@ export class TransactionFormComponent implements OnInit {
 
   loadTransaction(id: string): void {
     this.transactionService.getById(id).subscribe({
-      next: (transaction) => {
+      next: (response) => {
+        // CORRECCIÓN: Acceder a response.data ya que es ApiResponse<Transaction>
+        const transaction = response.data;
+
         this.form.patchValue({
           type: transaction.type,
           amount: parseFloat(transaction.amount) / 100,

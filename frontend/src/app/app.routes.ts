@@ -79,6 +79,14 @@ export const routes: Routes = [
         loadComponent: () => import('./features/categories/categories-list/categories-list.component').then(m => m.CategoriesListComponent)
       },
 
+      // Payment Methods
+      {
+        path: 'payment-methods',
+        loadComponent: () => import('./features/payment-methods/payment-methods.component').then(m => m.PaymentMethodsComponent),
+        canActivate: [roleGuard],
+        data: { roles: ['OWNER', 'ADMIN', 'TREASURER'] }
+      },
+
       // Reports
       {
         path: 'reports',

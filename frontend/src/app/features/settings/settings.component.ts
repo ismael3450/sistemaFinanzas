@@ -37,11 +37,17 @@ import { DateAgoPipe } from '../../shared/pipes';
         <!-- Organization Settings -->
         <p-tabPanel header="Organización">
           <p-card>
+            @if (!canManageOrganization()) {
+              <div class="mb-4 rounded border border-yellow-200 bg-yellow-50 px-4 py-3 text-sm text-yellow-900">
+                <i class="pi pi-info-circle mr-2"></i>
+                No tienes permisos para editar la organización. Contacta a un administrador si necesitas cambios.
+              </div>
+            }
             <form [formGroup]="orgForm" (ngSubmit)="saveOrganization()">
               <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
                 <div class="form-group">
                   <label>Nombre de la Organización *</label>
-                  <input pInputText formControlName="name" class="w-full">
+                  <input pInputText formControlName="name" class="w-full" [readonly]="!canManageOrganization()">
                 </div>
                 <div class="form-group">
                   <label>Moneda</label>
@@ -50,6 +56,7 @@ import { DateAgoPipe } from '../../shared/pipes';
                       formControlName="currency"
                       optionLabel="label"
                       optionValue="value"
+                      [disabled]="!canManageOrganization()"
                       appendTo="body"
                       styleClass="w-full">
                   </p-dropdown>
@@ -57,7 +64,12 @@ import { DateAgoPipe } from '../../shared/pipes';
               </div>
               <div class="form-group">
                 <label>Descripción</label>
-                <textarea pInputTextarea formControlName="description" [rows]="3" class="w-full"></textarea>
+                <textarea
+                    pInputTextarea
+                    formControlName="description"
+                    [rows]="3"
+                    class="w-full"
+                    [readonly]="!canManageOrganization()"></textarea>
               </div>
               <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
                 <div class="form-group">
@@ -68,6 +80,7 @@ import { DateAgoPipe } from '../../shared/pipes';
                       optionLabel="label"
                       optionValue="value"
                       [filter]="true"
+                      [disabled]="!canManageOrganization()"
                       appendTo="body"
                       styleClass="w-full">
                   </p-dropdown>
@@ -79,13 +92,21 @@ import { DateAgoPipe } from '../../shared/pipes';
                       formControlName="fiscalYearStart"
                       optionLabel="label"
                       optionValue="value"
+                      [disabled]="!canManageOrganization()"
                       appendTo="body"
                       styleClass="w-full">
                   </p-dropdown>
                 </div>
               </div>
               <div class="flex justify-end mt-4">
-                <p-button type="submit" label="Guardar Cambios" [loading]="savingOrg()"></p-button>
+                <p-button
+                    type="submit"
+                    label="Guardar Cambios"
+                    [loading]="savingOrg()"
+                    [disabled]="orgForm.invalid || !canManageOrganization()"
+                    [pTooltip]="!canManageOrganization() ? 'No tienes permisos para editar la organización' : ''"
+                    [tooltipDisabled]="canManageOrganization()">
+                </p-button>
               </div>
             </form>
           </p-card>
@@ -389,6 +410,7 @@ export class SettingsComponent implements OnInit {
 
   currentUserId = computed(() => this.authService.currentUser()?.id);
   currentRole = computed(() => this.orgService.currentRole());
+  canManageOrganization = computed(() => this.orgService.canManageOrg());
 
   canManageMembers = computed(() => {
     const role = this.currentRole();
@@ -435,15 +457,17 @@ export class SettingsComponent implements OnInit {
 
   loadMembers(): void {
     this.memberService.getAll().subscribe({
-      next: (members) => this.members.set(members)
+      next: (response) => this.members.set(response.data.data)
     });
   }
 
   saveOrganization(): void {
     if (this.orgForm.invalid) return;
+    const orgId = this.orgService.activeOrgId();
+    if (!orgId) return;
     this.savingOrg.set(true);
 
-    this.orgService.updateOrganization(this.orgForm.value).subscribe({
+    this.orgService.update(orgId, this.orgForm.value).subscribe({
       next: () => {
         this.messageService.add({ severity: 'success', summary: 'Éxito', detail: 'Organización actualizada' });
         this.savingOrg.set(false);

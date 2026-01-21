@@ -188,6 +188,7 @@ export class LayoutComponent {
     { label: 'Transacciones', icon: 'pi-arrow-right-arrow-left', route: '/transactions' },
     { label: 'Cuentas', icon: 'pi-wallet', route: '/accounts' },
     { label: 'Categorías', icon: 'pi-tags', route: '/categories' },
+    { label: 'Métodos de Pago', icon: 'pi-credit-card', route: '/payment-methods', roles: ['OWNER', 'ADMIN', 'TREASURER'] },
     { label: 'Reportes', icon: 'pi-chart-bar', route: '/reports' },
     { label: 'Miembros', icon: 'pi-users', route: '/settings/members', roles: ['OWNER', 'ADMIN'] },
     { label: 'Auditoría', icon: 'pi-history', route: '/audit', roles: ['OWNER', 'ADMIN'] },

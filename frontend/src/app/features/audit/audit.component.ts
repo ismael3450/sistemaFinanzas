@@ -13,7 +13,7 @@ import { PaginatorModule } from 'primeng/paginator';
 import { SkeletonModule } from 'primeng/skeleton';
 import { TooltipModule } from 'primeng/tooltip';
 import { AuditService, MemberService } from '../../core/services';
-import { AuditLog, AuditAction, Member } from '../../core/models';
+import { AuditLog, AuditAction, AuditFilter } from '../../core/models';
 import { DateAgoPipe } from '../../shared/pipes';
 
 @Component({
@@ -39,11 +39,11 @@ import { DateAgoPipe } from '../../shared/pipes';
     <div class="page-container">
       <div class="page-header">
         <h1>Bitácora de Auditoría</h1>
-        <p-button 
-          icon="pi pi-refresh" 
-          label="Actualizar"
-          [outlined]="true"
-          (onClick)="loadLogs()">
+        <p-button
+            icon="pi pi-refresh"
+            label="Actualizar"
+            [outlined]="true"
+            (onClick)="loadLogs()">
         </p-button>
       </div>
 
@@ -52,35 +52,35 @@ import { DateAgoPipe } from '../../shared/pipes';
         <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-5 gap-4">
           <div class="form-group mb-0">
             <label>Fecha Inicio</label>
-            <p-calendar 
-              [(ngModel)]="filters.startDate"
-              dateFormat="dd/mm/yy"
-              [showIcon]="true"
-              appendTo="body"
-              styleClass="w-full">
+            <p-calendar
+                [(ngModel)]="filters.startDate"
+                dateFormat="dd/mm/yy"
+                [showIcon]="true"
+                appendTo="body"
+                styleClass="w-full">
             </p-calendar>
           </div>
           <div class="form-group mb-0">
             <label>Fecha Fin</label>
-            <p-calendar 
-              [(ngModel)]="filters.endDate"
-              dateFormat="dd/mm/yy"
-              [showIcon]="true"
-              appendTo="body"
-              styleClass="w-full">
+            <p-calendar
+                [(ngModel)]="filters.endDate"
+                dateFormat="dd/mm/yy"
+                [showIcon]="true"
+                appendTo="body"
+                styleClass="w-full">
             </p-calendar>
           </div>
           <div class="form-group mb-0">
             <label>Usuario</label>
-            <p-dropdown 
-              [options]="members()"
-              [(ngModel)]="filters.userId"
-              optionLabel="user.firstName"
-              optionValue="userId"
-              placeholder="Todos"
-              [showClear]="true"
-              appendTo="body"
-              styleClass="w-full">
+            <p-dropdown
+                [options]="members()"
+                [(ngModel)]="filters.userId"
+                optionLabel="user.firstName"
+                optionValue="userId"
+                placeholder="Todos"
+                [showClear]="true"
+                appendTo="body"
+                styleClass="w-full">
               <ng-template pTemplate="selectedItem" let-member>
                 {{ member?.user?.firstName }} {{ member?.user?.lastName }}
               </ng-template>
@@ -91,51 +91,51 @@ import { DateAgoPipe } from '../../shared/pipes';
           </div>
           <div class="form-group mb-0">
             <label>Módulo</label>
-            <p-dropdown 
-              [options]="moduleOptions"
-              [(ngModel)]="filters.module"
-              optionLabel="label"
-              optionValue="value"
-              placeholder="Todos"
-              [showClear]="true"
-              appendTo="body"
-              styleClass="w-full">
+            <p-dropdown
+                [options]="moduleOptions"
+                [(ngModel)]="filters.module"
+                optionLabel="label"
+                optionValue="value"
+                placeholder="Todos"
+                [showClear]="true"
+                appendTo="body"
+                styleClass="w-full">
             </p-dropdown>
           </div>
           <div class="form-group mb-0">
             <label>Acción</label>
-            <p-dropdown 
-              [options]="actionOptions"
-              [(ngModel)]="filters.action"
-              optionLabel="label"
-              optionValue="value"
-              placeholder="Todas"
-              [showClear]="true"
-              appendTo="body"
-              styleClass="w-full">
+            <p-dropdown
+                [options]="actionOptions"
+                [(ngModel)]="filters.action"
+                optionLabel="label"
+                optionValue="value"
+                placeholder="Todas"
+                [showClear]="true"
+                appendTo="body"
+                styleClass="w-full">
             </p-dropdown>
           </div>
         </div>
         <div class="flex justify-end mt-4">
-          <p-button 
-            icon="pi pi-filter-slash" 
-            label="Limpiar"
-            severity="secondary"
-            [outlined]="true"
-            class="mr-2"
-            (onClick)="clearFilters()">
+          <p-button
+              icon="pi pi-filter-slash"
+              label="Limpiar"
+              severity="secondary"
+              [outlined]="true"
+              class="mr-2"
+              (onClick)="clearFilters()">
           </p-button>
-          <p-button 
-            icon="pi pi-search" 
-            label="Buscar"
-            (onClick)="loadLogs()">
+          <p-button
+              icon="pi pi-search"
+              label="Buscar"
+              (onClick)="loadLogs()">
           </p-button>
         </div>
       </p-card>
 
       <!-- Tabla de logs -->
       <p-card>
-        @if (loading()) {
+        @if (isLoading()) {
           <div class="space-y-4">
             @for (i of [1,2,3,4,5]; track i) {
               <div class="flex gap-4 items-center">
@@ -147,11 +147,11 @@ import { DateAgoPipe } from '../../shared/pipes';
             }
           </div>
         } @else {
-          <p-table 
-            [value]="logs()" 
-            [rowHover]="true"
-            styleClass="p-datatable-sm"
-            [paginator]="false">
+          <p-table
+              [value]="logs()"
+              [rowHover]="true"
+              styleClass="p-datatable-sm"
+              [paginator]="false">
             <ng-template pTemplate="header">
               <tr>
                 <th style="width: 180px">Fecha</th>
@@ -183,9 +183,9 @@ import { DateAgoPipe } from '../../shared/pipes';
                   </div>
                 </td>
                 <td>
-                  <p-tag 
-                    [value]="getActionLabel(log.action)" 
-                    [severity]="getActionSeverity(log.action)">
+                  <p-tag
+                      [value]="getActionLabel(log.action)"
+                      [severity]="getActionSeverity(log.action)">
                   </p-tag>
                 </td>
                 <td>
@@ -198,12 +198,12 @@ import { DateAgoPipe } from '../../shared/pipes';
                 </td>
                 <td class="text-center">
                   @if (log.oldValues || log.newValues) {
-                    <button 
-                      pButton 
-                      icon="pi pi-eye" 
-                      class="p-button-text p-button-sm"
-                      pTooltip="Ver cambios"
-                      (click)="showDetails(log)">
+                    <button
+                        pButton
+                        icon="pi pi-eye"
+                        class="p-button-text p-button-sm"
+                        pTooltip="Ver cambios"
+                        (click)="showDetails(log)">
                     </button>
                   }
                 </td>
@@ -220,13 +220,13 @@ import { DateAgoPipe } from '../../shared/pipes';
           </p-table>
 
           <!-- Paginador -->
-          @if (totalRecords() > 0) {
-            <p-paginator 
-              [rows]="pageSize"
-              [totalRecords]="totalRecords()"
-              [first]="(currentPage() - 1) * pageSize"
-              (onPageChange)="onPageChange($event)"
-              [rowsPerPageOptions]="[10, 25, 50]">
+          @if (totalCount() > 0) {
+            <p-paginator
+                [rows]="pageSize"
+                [totalRecords]="totalCount()"
+                [first]="(currentPage() - 1) * pageSize"
+                (onPageChange)="onPageChange($event)"
+                [rowsPerPageOptions]="[10, 25, 50]">
             </p-paginator>
           }
         }
@@ -234,12 +234,12 @@ import { DateAgoPipe } from '../../shared/pipes';
     </div>
 
     <!-- Dialog de detalles -->
-    <p-dialog 
-      [(visible)]="detailsDialogVisible" 
-      header="Detalles del Cambio" 
-      [modal]="true"
-      [style]="{ width: '600px', maxHeight: '90vh' }"
-      [contentStyle]="{ 'overflow-y': 'auto' }">
+    <p-dialog
+        [(visible)]="detailsDialogVisible"
+        header="Detalles del Cambio"
+        [modal]="true"
+        [style]="{ width: '600px', maxHeight: '90vh' }"
+        [contentStyle]="{ 'overflow-y': 'auto' }">
       @if (selectedLog()) {
         <div class="space-y-4">
           <div class="grid grid-cols-2 gap-4">
@@ -302,23 +302,19 @@ export class AuditComponent implements OnInit {
   private readonly auditService = inject(AuditService);
   private readonly memberService = inject(MemberService);
 
-  loading = signal(false);
-  logs = signal<AuditLog[]>([]);
-  members = signal<Member[]>([]);
-  totalRecords = signal(0);
+  // Usar signals del servicio directamente
+  readonly logs = this.auditService.logs;
+  readonly totalCount = this.auditService.totalCount;
+  readonly isLoading = this.auditService.isLoading;
+  readonly members = this.memberService.members;
+
   currentPage = signal(1);
   pageSize = 10;
 
   detailsDialogVisible = false;
   selectedLog = signal<AuditLog | null>(null);
 
-  filters: {
-    startDate?: Date;
-    endDate?: Date;
-    userId?: string;
-    module?: string;
-    action?: AuditAction;
-  } = {};
+  filters: AuditFilter = {};
 
   moduleOptions = [
     { label: 'Autenticación', value: 'AUTH' },
@@ -348,30 +344,30 @@ export class AuditComponent implements OnInit {
     this.loadLogs();
   }
 
+  /**
+   * Cargar miembros - el servicio actualiza su signal interno
+   */
   loadMembers(): void {
     this.memberService.getAll().subscribe({
-      next: (members) => this.members.set(members)
+      next: () => console.log('Miembros cargados'),
+      error: (err) => console.error('Error cargando miembros:', err)
     });
   }
 
+  /**
+   * Cargar logs de auditoría - usa getAll() del servicio
+   * El servicio actualiza sus signals internos (_logs, _totalCount)
+   */
   loadLogs(): void {
-    this.loading.set(true);
-
-    const query = {
+    const query: AuditFilter = {
       ...this.filters,
       page: this.currentPage(),
       limit: this.pageSize
     };
 
-    this.auditService.getLogs(query).subscribe({
-      next: (response) => {
-        this.logs.set(response.data);
-        this.totalRecords.set(response.total);
-        this.loading.set(false);
-      },
-      error: () => {
-        this.loading.set(false);
-      }
+    this.auditService.getAll(query).subscribe({
+      next: () => console.log('Logs cargados'),
+      error: (err) => console.error('Error cargando logs:', err)
     });
   }
 
@@ -381,9 +377,11 @@ export class AuditComponent implements OnInit {
     this.loadLogs();
   }
 
-  onPageChange(event: any): void {
-    this.currentPage.set(Math.floor(event.first / event.rows) + 1);
-    this.pageSize = event.rows;
+  onPageChange(event: { first?: number; rows?: number }): void {
+    const first = event.first ?? 0;
+    const rows = event.rows ?? this.pageSize;
+    this.currentPage.set(Math.floor(first / rows) + 1);
+    this.pageSize = rows;
     this.loadLogs();
   }
 

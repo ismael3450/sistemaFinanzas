@@ -109,6 +109,22 @@ export class AuthService {
     );
   }
 
+  updateProfile(data: Pick<User, 'firstName' | 'lastName'>): Observable<ApiResponse<User>> {
+    return this.http.patch<ApiResponse<User>>(`${this.API_URL}/me`, data).pipe(
+        tap(response => {
+          this._currentUser.set(response.data);
+          localStorage.setItem(this.USER_KEY, JSON.stringify(response.data));
+        })
+    );
+  }
+
+  changePassword(currentPassword: string, newPassword: string): Observable<ApiResponse<{ message: string }>> {
+    return this.http.post<ApiResponse<{ message: string }>>(`${this.API_URL}/change-password`, {
+      currentPassword,
+      newPassword
+    });
+  }
+
   private handleAuthResponse(auth: AuthResponse): void {
     this.setToken(auth.tokens.accessToken);
     this.setRefreshToken(auth.tokens.refreshToken);
