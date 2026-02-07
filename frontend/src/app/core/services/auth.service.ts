@@ -131,6 +131,7 @@ export class AuthService {
     this._currentUser.set(auth.user);
     this._isAuthenticated.set(true);
     localStorage.setItem(this.USER_KEY, JSON.stringify(auth.user));
+    this.getCurrentUser().subscribe({ error: () => null });
   }
 
   getToken(): string | null {

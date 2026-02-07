@@ -43,14 +43,19 @@ import { LoadingComponent, EmptyStateComponent } from '../../../shared/component
   providers: [ConfirmationService, MessageService],
   template: `
     <div class="page-container">
-      <div class="page-header">
-        <h1>Transacciones</h1>
+      <!-- Header -->
+      <div class="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4 mb-6">
+        <div>
+          <h1 class="text-xl font-bold text-gray-900">Transacciones</h1>
+          <p class="text-sm text-gray-500 mt-1">Gestiona tus movimientos financieros</p>
+        </div>
         <div class="flex gap-2">
           <p-button
               icon="pi pi-download"
               label="Exportar"
               severity="secondary"
               [outlined]="true"
+              styleClass="hidden sm:flex"
               (onClick)="exportMenu.toggle($event)">
           </p-button>
           <p-button
@@ -61,13 +66,14 @@ import { LoadingComponent, EmptyStateComponent } from '../../../shared/component
         </div>
       </div>
 
-      <!-- Filters -->
-      <p-card styleClass="mb-6">
+      <!-- Filters Card -->
+      <div class="bg-white rounded-2xl border border-gray-100 shadow-sm p-5 mb-6">
         <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-5 gap-4">
+          <!-- Search -->
           <div>
-            <label class="block text-sm font-medium text-gray-700 mb-1">Buscar</label>
+            <label class="block text-xs font-semibold text-gray-500 uppercase tracking-wide mb-2">Buscar</label>
             <span class="p-input-icon-left w-full">
-              <i class="pi pi-search"></i>
+              <i class="pi pi-search text-gray-400"></i>
               <input
                   pInputText
                   [(ngModel)]="filters.search"
@@ -77,28 +83,44 @@ import { LoadingComponent, EmptyStateComponent } from '../../../shared/component
             </span>
           </div>
 
+          <!-- Type Filter -->
           <div>
-            <label class="block text-sm font-medium text-gray-700 mb-1">Tipo</label>
+            <label class="block text-xs font-semibold text-gray-500 uppercase tracking-wide mb-2">Tipo</label>
             <p-dropdown
                 [options]="typeOptions"
                 [(ngModel)]="filters.type"
                 optionLabel="label"
                 optionValue="value"
-                placeholder="Todos"
+                placeholder="Todos los tipos"
                 [showClear]="true"
                 styleClass="w-full"
                 (onChange)="applyFilters()">
+              <ng-template pTemplate="selectedItem" let-item>
+                @if (item) {
+                  <div class="flex items-center gap-2">
+                    <span class="w-2 h-2 rounded-full" [class]="getTypeDotClass(item.value)"></span>
+                    <span>{{ item.label }}</span>
+                  </div>
+                }
+              </ng-template>
+              <ng-template pTemplate="item" let-item>
+                <div class="flex items-center gap-2">
+                  <span class="w-2 h-2 rounded-full" [class]="getTypeDotClass(item.value)"></span>
+                  <span>{{ item.label }}</span>
+                </div>
+              </ng-template>
             </p-dropdown>
           </div>
 
+          <!-- Category Filter -->
           <div>
-            <label class="block text-sm font-medium text-gray-700 mb-1">Categoría</label>
+            <label class="block text-xs font-semibold text-gray-500 uppercase tracking-wide mb-2">Categoría</label>
             <p-dropdown
                 [options]="categories()"
                 [(ngModel)]="filters.categoryId"
                 optionLabel="name"
                 optionValue="id"
-                placeholder="Todas"
+                placeholder="Todas las categorías"
                 [showClear]="true"
                 [filter]="true"
                 styleClass="w-full"
@@ -106,51 +128,60 @@ import { LoadingComponent, EmptyStateComponent } from '../../../shared/component
             </p-dropdown>
           </div>
 
+          <!-- Date From -->
           <div>
-            <label class="block text-sm font-medium text-gray-700 mb-1">Fecha Inicio</label>
+            <label class="block text-xs font-semibold text-gray-500 uppercase tracking-wide mb-2">Desde</label>
             <p-calendar
                 [(ngModel)]="filters.startDate"
                 dateFormat="dd/mm/yy"
                 [showIcon]="true"
                 styleClass="w-full"
+                placeholder="Fecha inicio"
                 (onSelect)="applyFilters()">
             </p-calendar>
           </div>
 
+          <!-- Date To -->
           <div>
-            <label class="block text-sm font-medium text-gray-700 mb-1">Fecha Fin</label>
+            <label class="block text-xs font-semibold text-gray-500 uppercase tracking-wide mb-2">Hasta</label>
             <p-calendar
                 [(ngModel)]="filters.endDate"
                 dateFormat="dd/mm/yy"
                 [showIcon]="true"
                 styleClass="w-full"
+                placeholder="Fecha fin"
                 (onSelect)="applyFilters()">
             </p-calendar>
           </div>
         </div>
 
-        <div class="flex justify-end mt-4">
-          <p-button
-              label="Limpiar Filtros"
-              severity="secondary"
-              [text]="true"
-              (onClick)="clearFilters()">
-          </p-button>
+        <!-- Clear Filters -->
+        <div class="flex justify-end mt-4 pt-4 border-t border-gray-100">
+          <button
+              class="text-sm text-gray-500 hover:text-gray-700 font-medium flex items-center gap-1.5 transition-colors"
+              (click)="clearFilters()">
+            <i class="pi pi-filter-slash text-xs"></i>
+            Limpiar filtros
+          </button>
         </div>
-      </p-card>
+      </div>
 
-      <!-- Table -->
-      <p-card>
+      <!-- Table Card -->
+      <div class="bg-white rounded-2xl border border-gray-100 shadow-sm overflow-hidden">
         @if (isLoading()) {
-          <app-loading></app-loading>
+          <div class="p-8">
+            <app-loading></app-loading>
+          </div>
         } @else if (transactions().length === 0) {
-          <app-empty-state
-              icon="pi-arrow-right-arrow-left"
-              title="Sin transacciones"
-              message="No hay transacciones que coincidan con los filtros seleccionados"
-              actionLabel="Nueva Transacción"
-              [action]="goToNew">
-          </app-empty-state>
+          <div class="p-8">
+            <app-empty-state
+                icon="pi-arrow-right-arrow-left"
+                title="Sin transacciones"
+                message="No hay transacciones que coincidan con los filtros seleccionados"
+                actionLabel="Nueva Transacción"
+                [action]="goToNew">
+            </app-empty-state>
+          </div>
         } @else {
           <p-table
               [value]="transactions()"
@@ -160,81 +191,101 @@ import { LoadingComponent, EmptyStateComponent } from '../../../shared/component
               [lazy]="true"
               (onLazyLoad)="onLazyLoad($event)"
               [rowHover]="true"
-              styleClass="p-datatable-sm">
+              styleClass="p-datatable-sm"
+              [tableStyle]="{'min-width': '60rem'}">
             <ng-template pTemplate="header">
               <tr>
-                <th>Fecha</th>
+                <th style="width: 140px">Fecha</th>
                 <th>Descripción</th>
-                <th>Categoría</th>
-                <th>Cuenta</th>
-                <th>Tipo</th>
-                <th>Estado</th>
-                <th class="text-right">Monto</th>
-                <th class="text-center" style="width: 100px">Acciones</th>
+                <th style="width: 140px">Categoría</th>
+                <th style="width: 180px">Cuenta</th>
+                <th style="width: 100px">Tipo</th>
+                <th style="width: 100px">Estado</th>
+                <th style="width: 130px" class="text-right">Monto</th>
+                <th style="width: 100px" class="text-center">Acciones</th>
               </tr>
             </ng-template>
             <ng-template pTemplate="body" let-txn>
-              <tr>
+              <tr class="group cursor-pointer" [routerLink]="['/transactions', txn.id]">
                 <td>
                   <div class="flex flex-col">
-                    <span class="font-medium">{{ txn.transactionDate | date:'dd/MM/yyyy' }}</span>
-                    <span class="text-xs text-gray-500">{{ txn.transactionDate | date:'HH:mm' }}</span>
+                    <span class="font-medium text-gray-800">{{ txn.transactionDate | date:'dd MMM yyyy' }}</span>
+                    <span class="text-xs text-gray-400">{{ txn.transactionDate | date:'HH:mm' }}</span>
                   </div>
                 </td>
                 <td>
-                  <div class="flex flex-col">
-                    <span class="font-medium">{{ txn.description || 'Sin descripción' }}</span>
+                  <div class="flex flex-col min-w-0">
+                    <span class="font-medium text-gray-800 truncate">{{ txn.description || 'Sin descripción' }}</span>
                     @if (txn.reference) {
-                      <span class="text-xs text-gray-500">Ref: {{ txn.reference }}</span>
+                      <span class="text-xs text-gray-400 font-mono">{{ txn.reference }}</span>
                     }
                   </div>
                 </td>
-                <td>{{ txn.categoryName || '-' }}</td>
                 <td>
-                  @if (txn.type === 'INCOME') {
-                    {{ txn.toAccountName }}
-                  } @else if (txn.type === 'EXPENSE') {
-                    {{ txn.fromAccountName }}
+                  @if (txn.categoryName) {
+                    <span class="inline-flex items-center gap-1.5 px-2.5 py-1 rounded-full text-xs font-medium bg-gray-100 text-gray-700">
+                      {{ txn.categoryName }}
+                    </span>
                   } @else {
-                    {{ txn.fromAccountName }} → {{ txn.toAccountName }}
+                    <span class="text-gray-400">-</span>
                   }
                 </td>
                 <td>
-                  <p-tag [value]="getTypeLabel(txn.type)" [severity]="getTypeSeverity(txn.type)"></p-tag>
+                  <div class="text-sm text-gray-700">
+                    @if (txn.type === 'INCOME') {
+                      <span class="flex items-center gap-1">
+                        <i class="pi pi-arrow-down text-emerald-500 text-xs"></i>
+                        {{ txn.toAccountName }}
+                      </span>
+                    } @else if (txn.type === 'EXPENSE') {
+                      <span class="flex items-center gap-1">
+                        <i class="pi pi-arrow-up text-rose-500 text-xs"></i>
+                        {{ txn.fromAccountName }}
+                      </span>
+                    } @else {
+                      <span class="flex items-center gap-1 text-xs">
+                        {{ txn.fromAccountName }}
+                        <i class="pi pi-arrow-right text-indigo-500"></i>
+                        {{ txn.toAccountName }}
+                      </span>
+                    }
+                  </div>
                 </td>
                 <td>
-                  <p-tag [value]="getStatusLabel(txn.status)" [severity]="getStatusSeverity(txn.status)"></p-tag>
+                  <span class="inline-flex items-center gap-1.5 px-2.5 py-1 rounded-full text-xs font-semibold"
+                        [class]="getTypeTagClass(txn.type)">
+                    <span class="w-1.5 h-1.5 rounded-full" [class]="getTypeDotClass(txn.type)"></span>
+                    {{ getTypeLabel(txn.type) }}
+                  </span>
+                </td>
+                <td>
+                  <span class="inline-flex items-center px-2.5 py-1 rounded-full text-xs font-semibold"
+                        [class]="getStatusTagClass(txn.status)">
+                    {{ getStatusLabel(txn.status) }}
+                  </span>
                 </td>
                 <td class="text-right">
                   <span
-                      class="font-semibold tabular-nums"
-                      [class.text-green-600]="txn.type === 'INCOME'"
-                      [class.text-red-600]="txn.type === 'EXPENSE'"
-                      [class.text-blue-600]="txn.type === 'TRANSFER'">
+                      class="font-bold tabular-nums text-base"
+                      [class.text-emerald-600]="txn.type === 'INCOME'"
+                      [class.text-rose-600]="txn.type === 'EXPENSE'"
+                      [class.text-indigo-600]="txn.type === 'TRANSFER'">
                     {{ txn.type === 'INCOME' ? '+' : txn.type === 'EXPENSE' ? '-' : '' }}{{ txn.amount | money:txn.currency }}
                   </span>
                 </td>
-                <td class="text-center">
-                  <div class="flex justify-center gap-1">
+                <td class="text-center" (click)="$event.stopPropagation()">
+                  <div class="flex justify-center gap-1 opacity-0 group-hover:opacity-100 transition-opacity">
                     <button
                         pButton
                         pRipple
                         type="button"
-                        icon="pi pi-eye"
+                        icon="pi pi-pencil"
                         class="p-button-rounded p-button-text p-button-sm"
-                        pTooltip="Ver detalle"
-                        [routerLink]="['/transactions', txn.id]">
+                        pTooltip="Editar"
+                        [disabled]="txn.status === 'VOIDED'"
+                        [routerLink]="['/transactions', txn.id, 'edit']">
                     </button>
                     @if (txn.status !== 'VOIDED') {
-                      <button
-                          pButton
-                          pRipple
-                          type="button"
-                          icon="pi pi-pencil"
-                          class="p-button-rounded p-button-text p-button-sm"
-                          pTooltip="Editar"
-                          [routerLink]="['/transactions', txn.id, 'edit']">
-                      </button>
                       <button
                           pButton
                           pRipple
@@ -251,19 +302,29 @@ import { LoadingComponent, EmptyStateComponent } from '../../../shared/component
             </ng-template>
           </p-table>
         }
-      </p-card>
+      </div>
     </div>
 
     <!-- Export Menu -->
     <p-menu #exportMenu [popup]="true" [model]="exportOptions"></p-menu>
 
     <p-confirmDialog></p-confirmDialog>
-  `
+  `,
+  styles: [`
+    :host ::ng-deep {
+      .p-datatable .p-datatable-tbody > tr > td {
+        padding: 1rem;
+      }
+      
+      .p-datatable .p-datatable-tbody > tr {
+        transition: background 0.15s ease;
+      }
+    }
+  `]
 })
 export class TransactionsListComponent implements OnInit {
   @ViewChild('exportMenu') exportMenu!: Menu;
 
-  // Inyección de dependencias con inject()
   private transactionService = inject(TransactionService);
   private categoryService = inject(CategoryService);
   private accountService = inject(AccountService);
@@ -272,7 +333,6 @@ export class TransactionsListComponent implements OnInit {
   private messageService = inject(MessageService);
   private router = inject(Router);
 
-  // Ahora estas propiedades se pueden inicializar correctamente
   isLoading = this.transactionService.isLoading;
   transactions = this.transactionService.transactions;
   totalCount = this.transactionService.totalCount;
@@ -357,13 +417,22 @@ export class TransactionsListComponent implements OnInit {
     return labels[type] || type;
   }
 
-  getTypeSeverity(type: string): 'success' | 'danger' | 'info' {
-    const map: Record<string, 'success' | 'danger' | 'info'> = {
-      INCOME: 'success',
-      EXPENSE: 'danger',
-      TRANSFER: 'info'
+  getTypeDotClass(type: string): string {
+    const classes: Record<string, string> = {
+      INCOME: 'bg-emerald-500',
+      EXPENSE: 'bg-rose-500',
+      TRANSFER: 'bg-indigo-500'
     };
-    return map[type] || 'info';
+    return classes[type] || 'bg-gray-500';
+  }
+
+  getTypeTagClass(type: string): string {
+    const classes: Record<string, string> = {
+      INCOME: 'bg-emerald-50 text-emerald-700',
+      EXPENSE: 'bg-rose-50 text-rose-700',
+      TRANSFER: 'bg-indigo-50 text-indigo-700'
+    };
+    return classes[type] || 'bg-gray-50 text-gray-700';
   }
 
   getStatusLabel(status: string): string {
@@ -376,13 +445,13 @@ export class TransactionsListComponent implements OnInit {
     return labels[status] || status;
   }
 
-  getStatusSeverity(status: string): 'success' | 'danger' | 'warning' | 'info' {
-    const map: Record<string, 'success' | 'danger' | 'warning' | 'info'> = {
-      PENDING: 'warning',
-      COMPLETED: 'success',
-      CANCELLED: 'danger',
-      VOIDED: 'danger'
+  getStatusTagClass(status: string): string {
+    const classes: Record<string, string> = {
+      PENDING: 'bg-amber-50 text-amber-700',
+      COMPLETED: 'bg-emerald-50 text-emerald-700',
+      CANCELLED: 'bg-gray-100 text-gray-600',
+      VOIDED: 'bg-rose-50 text-rose-700'
     };
-    return map[status] || 'info';
+    return classes[status] || 'bg-gray-50 text-gray-700';
   }
 }

@@ -10,6 +10,7 @@ export interface User {
   avatarUrl?: string;
   emailVerified: boolean;
   activeOrgId?: string;
+  organizations?: UserOrganization[];
   createdAt: Date;
 }
 
@@ -72,6 +73,14 @@ export interface CreateOrganizationRequest {
 // MEMBERSHIP
 // ==========================================
 export type Role = 'OWNER' | 'ADMIN' | 'TREASURER' | 'MEMBER' | 'VIEWER';
+
+export interface UserOrganization {
+  id: string;
+  name: string;
+  slug: string;
+  logoUrl?: string;
+  role: Role;
+}
 
 export interface Member {
   id: string;

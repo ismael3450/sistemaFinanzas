@@ -1,6 +1,6 @@
 import { Component, signal, computed, inject } from '@angular/core';
 import { CommonModule } from '@angular/common';
-import { RouterModule, Router } from '@angular/router';
+import { RouterModule, Router, NavigationEnd } from '@angular/router';
 import { ButtonModule } from 'primeng/button';
 import { AvatarModule } from 'primeng/avatar';
 import { MenuModule } from 'primeng/menu';
@@ -8,6 +8,7 @@ import { TooltipModule } from 'primeng/tooltip';
 import { RippleModule } from 'primeng/ripple';
 import { BadgeModule } from 'primeng/badge';
 import { MenuItem } from 'primeng/api';
+import { filter } from 'rxjs';
 import { AuthService, OrganizationService } from '../../core/services';
 
 interface NavItem {
@@ -31,120 +32,151 @@ interface NavItem {
     BadgeModule
   ],
   template: `
-    <div class="min-h-screen bg-gray-50">
+    <div class="min-h-screen bg-[#fafbfc]">
       <!-- Sidebar -->
       <aside
-          class="fixed left-0 top-0 z-40 h-screen transition-all duration-300 bg-white border-r border-gray-200"
-          [class.w-64]="!sidebarCollapsed()"
-          [class.w-20]="sidebarCollapsed()">
+          class="fixed left-0 top-0 z-40 h-screen transition-all duration-300 ease-out bg-white border-r border-gray-100"
+          [class.w-[260px]]="!sidebarCollapsed()"
+          [class.w-[72px]]="sidebarCollapsed()">
 
-        <!-- Logo -->
-        <div class="h-16 flex items-center justify-between px-4 border-b border-gray-200">
+        <!-- Logo Section -->
+        <div class="h-16 flex items-center px-5 border-b border-gray-100"
+             [class.justify-center]="sidebarCollapsed()"
+             [class.justify-between]="!sidebarCollapsed()">
           @if (!sidebarCollapsed()) {
-            <div class="flex items-center gap-2">
-              <div class="w-8 h-8 bg-primary-600 rounded-lg flex items-center justify-center">
-                <i class="pi pi-wallet text-white"></i>
+            <div class="flex items-center gap-3">
+              <div class="w-9 h-9 bg-gradient-to-br from-indigo-500 to-purple-600 rounded-xl flex items-center justify-center shadow-md shadow-indigo-200">
+                <i class="pi pi-chart-line text-white text-sm"></i>
               </div>
-              <span class="font-bold text-gray-800">FinControl</span>
+              <div>
+                <span class="font-bold text-gray-900 text-base tracking-tight">FinControl</span>
+                <span class="text-[10px] text-gray-400 block -mt-0.5">Sistema Financiero</span>
+              </div>
             </div>
           } @else {
-            <div class="w-8 h-8 bg-primary-600 rounded-lg flex items-center justify-center mx-auto">
-              <i class="pi pi-wallet text-white"></i>
+            <div class="w-9 h-9 bg-gradient-to-br from-indigo-500 to-purple-600 rounded-xl flex items-center justify-center shadow-md shadow-indigo-200">
+              <i class="pi pi-chart-line text-white text-sm"></i>
             </div>
           }
           <button
               pRipple
-              class="p-2 rounded-lg hover:bg-gray-100 transition-colors hidden lg:block"
+              class="p-2 rounded-lg hover:bg-gray-50 transition-colors text-gray-400 hover:text-gray-600 hidden lg:block"
+              [class.invisible]="sidebarCollapsed()"
               (click)="toggleSidebar()">
-            <i class="pi" [class.pi-chevron-left]="!sidebarCollapsed()" [class.pi-chevron-right]="sidebarCollapsed()"></i>
+            <i class="pi pi-chevron-left text-xs"></i>
           </button>
         </div>
 
         <!-- Organization Selector -->
         @if (!sidebarCollapsed() && activeOrg()) {
-          <div class="p-4 border-b border-gray-200">
+          <div class="p-4">
             <button
                 pRipple
-                class="w-full flex items-center gap-3 p-3 rounded-lg bg-gray-50 hover:bg-gray-100 transition-colors"
+                class="w-full flex items-center gap-3 p-3 rounded-xl bg-gradient-to-r from-gray-50 to-gray-100/50 hover:from-gray-100 hover:to-gray-100 transition-all duration-200 border border-gray-100"
                 (click)="goToOrganizations()">
-              <div class="w-10 h-10 bg-primary-100 rounded-lg flex items-center justify-center">
-                <span class="text-primary-600 font-semibold">{{ orgInitials() }}</span>
+              <div class="w-10 h-10 bg-gradient-to-br from-indigo-100 to-purple-100 rounded-lg flex items-center justify-center flex-shrink-0">
+                <span class="text-indigo-600 font-bold text-sm">{{ orgInitials() }}</span>
               </div>
-              <div class="flex-1 text-left overflow-hidden">
-                <p class="font-medium text-gray-800 truncate">{{ activeOrg()?.name }}</p>
+              <div class="flex-1 text-left overflow-hidden min-w-0">
+                <p class="font-semibold text-gray-800 text-sm truncate">{{ activeOrg()?.name }}</p>
                 <p class="text-xs text-gray-500">{{ getRoleLabel(currentRole()) }}</p>
               </div>
-              <i class="pi pi-chevron-down text-gray-400"></i>
+              <i class="pi pi-chevron-right text-gray-300 text-xs"></i>
             </button>
           </div>
         }
 
         <!-- Navigation -->
-        <nav class="p-4 space-y-1 overflow-y-auto" style="height: calc(100vh - 180px);">
+        <nav class="px-3 py-2 space-y-1 overflow-y-auto"
+             [style.height]="sidebarCollapsed() ? 'calc(100vh - 80px)' : 'calc(100vh - 180px)'">
           @for (item of navItems; track item.route) {
-            <!-- CORRECCIÓN: Ahora usamos canShowNavItem para filtrar items por rol -->
             @if (canShowNavItem(item)) {
               <a
                   pRipple
                   [routerLink]="item.route"
-                  routerLinkActive="active-nav-item"
+                  routerLinkActive="nav-active"
                   [routerLinkActiveOptions]="{ exact: item.route === '/dashboard' }"
-                  class="flex items-center gap-3 px-3 py-2.5 rounded-lg text-gray-600 hover:bg-gray-100 transition-colors border-l-4 border-transparent"
+                  class="group flex items-center gap-3 px-3 py-2.5 rounded-xl text-gray-500 hover:text-gray-700 hover:bg-gray-50 transition-all duration-200"
+                  [class.justify-center]="sidebarCollapsed()"
                   [pTooltip]="sidebarCollapsed() ? item.label : ''"
                   tooltipPosition="right">
-                <i [class]="'pi ' + item.icon + ' text-lg'"></i>
+                <div class="w-8 h-8 rounded-lg flex items-center justify-center transition-colors group-hover:bg-gray-100">
+                  <i [class]="'pi ' + item.icon + ' text-base'"></i>
+                </div>
                 @if (!sidebarCollapsed()) {
-                  <span class="font-medium">{{ item.label }}</span>
+                  <span class="font-medium text-sm">{{ item.label }}</span>
                 }
               </a>
             }
           }
         </nav>
+
+        <!-- Collapse Button (visible when collapsed) -->
+        @if (sidebarCollapsed()) {
+          <div class="absolute bottom-4 left-0 right-0 flex justify-center">
+            <button
+                pRipple
+                class="p-2.5 rounded-xl hover:bg-gray-50 transition-colors text-gray-400 hover:text-gray-600"
+                (click)="toggleSidebar()">
+              <i class="pi pi-chevron-right text-xs"></i>
+            </button>
+          </div>
+        }
       </aside>
 
       <!-- Main Content -->
       <div
-          class="transition-all duration-300"
-          [class.ml-64]="!sidebarCollapsed()"
-          [class.ml-20]="sidebarCollapsed()">
+          class="transition-all duration-300 ease-out"
+          [class.ml-[260px]]="!sidebarCollapsed()"
+          [class.ml-[72px]]="sidebarCollapsed()">
 
         <!-- Top Header -->
-        <header class="h-16 bg-white border-b border-gray-200 flex items-center justify-between px-6 sticky top-0 z-30">
+        <header class="h-16 bg-white/80 backdrop-blur-md border-b border-gray-100 flex items-center justify-between px-6 sticky top-0 z-30">
           <div class="flex items-center gap-4">
             <button
                 pRipple
-                class="lg:hidden p-2 rounded-lg hover:bg-gray-100"
+                class="lg:hidden p-2 rounded-lg hover:bg-gray-50 text-gray-600"
                 (click)="toggleSidebar()">
               <i class="pi pi-bars"></i>
             </button>
-            <h1 class="text-lg font-semibold text-gray-800">{{ pageTitle() }}</h1>
+            <div>
+              <h1 class="text-lg font-semibold text-gray-900 tracking-tight">{{ pageTitle() }}</h1>
+            </div>
           </div>
 
-          <div class="flex items-center gap-4">
-            <!-- Notifications -->
-            <button pRipple class="p-2 rounded-lg hover:bg-gray-100 relative">
-              <i class="pi pi-bell text-gray-600"></i>
-              <span class="absolute top-1 right-1 w-2 h-2 bg-red-500 rounded-full"></span>
+          <div class="flex items-center gap-3">
+            <!-- Quick Actions -->
+            <button pRipple
+                    class="p-2.5 rounded-xl hover:bg-gray-50 text-gray-500 hover:text-gray-700 transition-colors relative"
+                    routerLink="/transactions/new"
+                    pTooltip="Nueva Transacción"
+                    tooltipPosition="bottom">
+              <i class="pi pi-plus text-sm"></i>
             </button>
+
+            <!-- Notifications -->
+            <button pRipple class="p-2.5 rounded-xl hover:bg-gray-50 text-gray-500 hover:text-gray-700 transition-colors relative">
+              <i class="pi pi-bell text-sm"></i>
+              <span class="absolute top-1.5 right-1.5 w-2 h-2 bg-rose-500 rounded-full ring-2 ring-white"></span>
+            </button>
+
+            <!-- Divider -->
+            <div class="w-px h-8 bg-gray-200 mx-1"></div>
 
             <!-- User Menu -->
             <div class="relative">
               <button
                   pRipple
-                  class="flex items-center gap-3 p-2 rounded-lg hover:bg-gray-100"
+                  class="flex items-center gap-3 p-1.5 pr-3 rounded-xl hover:bg-gray-50 transition-colors"
                   (click)="userMenu.toggle($event)">
-                <p-avatar
-                    [label]="userInitials()"
-                    styleClass="bg-primary-100 text-primary-600"
-                    shape="circle">
-                </p-avatar>
-                @if (!sidebarCollapsed()) {
-                  <div class="text-left hidden sm:block">
-                    <p class="text-sm font-medium text-gray-800">{{ userName() }}</p>
-                    <p class="text-xs text-gray-500">{{ userEmail() }}</p>
-                  </div>
-                }
-                <i class="pi pi-chevron-down text-gray-400 hidden sm:block"></i>
+                <div class="w-9 h-9 bg-gradient-to-br from-indigo-400 to-purple-500 rounded-xl flex items-center justify-center text-white font-semibold text-sm shadow-sm">
+                  {{ userInitials() }}
+                </div>
+                <div class="text-left hidden sm:block">
+                  <p class="text-sm font-medium text-gray-800">{{ userName() }}</p>
+                  <p class="text-[11px] text-gray-500 -mt-0.5">{{ userEmail() }}</p>
+                </div>
+                <i class="pi pi-chevron-down text-gray-400 text-[10px] hidden sm:block ml-1"></i>
               </button>
               <p-menu #userMenu [model]="userMenuItems" [popup]="true"></p-menu>
             </div>
@@ -152,7 +184,7 @@ interface NavItem {
         </header>
 
         <!-- Page Content -->
-        <main class="p-6">
+        <main class="p-6 min-h-[calc(100vh-64px)]">
           <router-outlet></router-outlet>
         </main>
       </div>
@@ -163,11 +195,37 @@ interface NavItem {
       display: block;
     }
 
-    /* CORRECCIÓN: Clase específica para nav activo */
-    .active-nav-item {
-      background-color: rgba(59, 130, 246, 0.1) !important;
-      color: #3b82f6 !important;
-      border-left-color: #3b82f6 !important;
+    /* Active nav item styling */
+    .nav-active {
+      background: linear-gradient(135deg, rgba(99, 102, 241, 0.08) 0%, rgba(139, 92, 246, 0.08) 100%) !important;
+      color: #4f46e5 !important;
+
+      > div {
+        background: linear-gradient(135deg, rgba(99, 102, 241, 0.15) 0%, rgba(139, 92, 246, 0.15) 100%) !important;
+      }
+
+      i {
+        color: #6366f1 !important;
+      }
+
+      span {
+        color: #4338ca !important;
+        font-weight: 600 !important;
+      }
+    }
+
+    /* Smooth scrollbar for nav */
+    nav::-webkit-scrollbar {
+      width: 4px;
+    }
+
+    nav::-webkit-scrollbar-track {
+      background: transparent;
+    }
+
+    nav::-webkit-scrollbar-thumb {
+      background: #e5e7eb;
+      border-radius: 100px;
     }
   `]
 })
@@ -178,6 +236,7 @@ export class LayoutComponent {
 
   sidebarCollapsed = signal(false);
   pageTitle = signal('Dashboard');
+  currentRoute = signal('');
 
   readonly activeOrg = this.orgService.activeOrganization;
   readonly currentRole = this.orgService.currentRole;
@@ -211,6 +270,40 @@ export class LayoutComponent {
     return name.split(' ').map(w => w[0]).join('').substring(0, 2).toUpperCase();
   });
 
+  constructor() {
+    // Listen to route changes to update page title
+    this.router.events.pipe(
+        filter(event => event instanceof NavigationEnd)
+    ).subscribe((event: any) => {
+      this.currentRoute.set(event.url);
+      this.updatePageTitle(event.url);
+    });
+  }
+
+  private updatePageTitle(url: string): void {
+    const titleMap: Record<string, string> = {
+      '/dashboard': 'Dashboard',
+      '/transactions': 'Transacciones',
+      '/transactions/new': 'Nueva Transacción',
+      '/accounts': 'Cuentas',
+      '/categories': 'Categorías',
+      '/payment-methods': 'Métodos de Pago',
+      '/reports': 'Reportes',
+      '/settings/members': 'Miembros',
+      '/audit': 'Auditoría',
+      '/settings': 'Configuración',
+      '/settings/profile': 'Mi Perfil'
+    };
+
+    // Find matching title
+    const matchingKey = Object.keys(titleMap).find(key => url.startsWith(key));
+    this.pageTitle.set(matchingKey ? titleMap[matchingKey] : 'Dashboard');
+  }
+
+  isRouteActive(route: string): boolean {
+    return this.currentRoute().startsWith(route);
+  }
+
   toggleSidebar(): void {
     this.sidebarCollapsed.update(v => !v);
   }
@@ -224,7 +317,6 @@ export class LayoutComponent {
   }
 
   /**
-   * CORRECCIÓN PRINCIPAL: Este método ahora se usa en el template
    * Verifica si el usuario tiene el rol necesario para ver el item
    */
   canShowNavItem(item: NavItem): boolean {
@@ -241,7 +333,7 @@ export class LayoutComponent {
    * Obtener etiqueta legible del rol
    */
   getRoleLabel(role: string | null): string {
-    if (!role) return '';
+    if (!role) return 'Cargando...';
     const labels: Record<string, string> = {
       OWNER: 'Propietario',
       ADMIN: 'Administrador',

@@ -211,6 +211,10 @@ import { DateAgoPipe } from '../../shared/pipes';
                 <input pInputText formControlName="email" class="w-full" [readonly]="true">
                 <small class="text-gray-500">El email no se puede cambiar</small>
               </div>
+              <div class="form-group">
+                <label>Rol en la organización</label>
+                <input pInputText class="w-full" [value]="roleLabel()" [readonly]="true">
+              </div>
               <div class="flex justify-end mt-4">
                 <p-button type="submit" label="Actualizar Perfil" [loading]="savingProfile()"></p-button>
               </div>
@@ -411,6 +415,10 @@ export class SettingsComponent implements OnInit {
   currentUserId = computed(() => this.authService.currentUser()?.id);
   currentRole = computed(() => this.orgService.currentRole());
   canManageOrganization = computed(() => this.orgService.canManageOrg());
+  roleLabel = computed(() => {
+    const role = this.currentRole();
+    return role ? this.getRoleLabel(role) : 'Sin rol asignado';
+  });
 
   canManageMembers = computed(() => {
     const role = this.currentRole();

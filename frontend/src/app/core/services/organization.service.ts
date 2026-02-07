@@ -17,6 +17,7 @@ import {
 export class OrganizationService {
   private readonly API_URL = `${environment.apiUrl}/organizations`;
   private readonly ACTIVE_ORG_KEY = 'active_organization';
+  private readonly ACTIVE_MEMBERSHIP_KEY = 'active_membership';
 
   // Signals
   private _organizations = signal<Organization[]>([]);
@@ -28,7 +29,7 @@ export class OrganizationService {
   readonly currentMembership = this._currentMembership.asReadonly();
 
   readonly hasActiveOrg = computed(() => this._activeOrganization() !== null);
-  
+
   readonly activeOrgId = computed(() => this._activeOrganization()?.id || null);
 
   readonly currentRole = computed(() => this._currentMembership()?.role || null);
@@ -50,6 +51,7 @@ export class OrganizationService {
 
   constructor(private http: HttpClient) {
     this.loadActiveOrganization();
+    this.loadActiveMembership();
   }
 
   private loadActiveOrganization(): void {
@@ -63,19 +65,30 @@ export class OrganizationService {
     }
   }
 
+  private loadActiveMembership(): void {
+    const stored = localStorage.getItem(this.ACTIVE_MEMBERSHIP_KEY);
+    if (stored) {
+      try {
+        this._currentMembership.set(JSON.parse(stored));
+      } catch {
+        localStorage.removeItem(this.ACTIVE_MEMBERSHIP_KEY);
+      }
+    }
+  }
+
   // CRUD Operations
   create(data: CreateOrganizationRequest): Observable<ApiResponse<Organization>> {
     return this.http.post<ApiResponse<Organization>>(this.API_URL, data).pipe(
-      tap(response => {
-        this._organizations.update(orgs => [...orgs, response.data]);
-        this.setActiveOrganization(response.data);
-      })
+        tap(response => {
+          this._organizations.update(orgs => [...orgs, response.data]);
+          this.setActiveOrganization(response.data);
+        })
     );
   }
 
   getAll(): Observable<ApiResponse<Organization[]>> {
     return this.http.get<ApiResponse<Organization[]>>(this.API_URL).pipe(
-      tap(response => this._organizations.set(response.data))
+        tap(response => this._organizations.set(response.data))
     );
   }
 
@@ -89,25 +102,29 @@ export class OrganizationService {
 
   update(id: string, data: Partial<CreateOrganizationRequest>): Observable<ApiResponse<Organization>> {
     return this.http.patch<ApiResponse<Organization>>(`${this.API_URL}/${id}`, data).pipe(
-      tap(response => {
-        this._organizations.update(orgs => 
-          orgs.map(o => o.id === id ? response.data : o)
-        );
-        if (this._activeOrganization()?.id === id) {
-          this.setActiveOrganization(response.data);
-        }
-      })
+        tap(response => {
+          this._organizations.update(orgs =>
+              orgs.map(o => o.id === id ? response.data : o)
+          );
+          if (this._activeOrganization()?.id === id) {
+            this.setActiveOrganization(response.data);
+          }
+        })
     );
   }
 
-  setActive(id: string): Observable<ApiResponse<{ message: string }>> {
-    return this.http.post<ApiResponse<{ message: string }>>(`${this.API_URL}/${id}/set-active`, {}).pipe(
-      tap(() => {
-        const org = this._organizations().find(o => o.id === id);
-        if (org) {
-          this.setActiveOrganization(org);
-        }
-      })
+  setActive(id: string): Observable<ApiResponse<{ message: string; membership: Member }>> {
+    return this.http.post<ApiResponse<{ message: string; membership: Member }>>(`${this.API_URL}/${id}/set-active`, {}).pipe(
+        tap((response) => {
+          const org = this._organizations().find(o => o.id === id);
+          if (org) {
+            this.setActiveOrganization(org);
+          }
+          // Set the current membership with the role
+          if (response.data.membership) {
+            this.setCurrentMembership(response.data.membership as Member);
+          }
+        })
     );
   }
 
@@ -129,10 +146,12 @@ export class OrganizationService {
     this._activeOrganization.set(null);
     this._currentMembership.set(null);
     localStorage.removeItem(this.ACTIVE_ORG_KEY);
+    localStorage.removeItem(this.ACTIVE_MEMBERSHIP_KEY);
   }
 
   setCurrentMembership(member: Member): void {
     this._currentMembership.set(member);
+    localStorage.setItem(this.ACTIVE_MEMBERSHIP_KEY, JSON.stringify(member));
   }
 
   hasPermission(requiredRoles: Role[]): boolean {

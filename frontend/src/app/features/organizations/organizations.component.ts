@@ -101,18 +101,18 @@ import { Organization } from '../../core/models';
         </div>
         <div class="form-group">
           <label>Descripción</label>
-          <textarea pInputTextarea formControlName="description" [rows]="3" 
+          <textarea pInputTextarea formControlName="description" [rows]="3"
                     placeholder="Descripción breve de la organización..." class="w-full"></textarea>
         </div>
         <div class="grid grid-cols-2 gap-4">
           <div class="form-group">
             <label>Moneda *</label>
-            <p-dropdown [options]="currencies" formControlName="currency" optionLabel="label" 
+            <p-dropdown [options]="currencies" formControlName="currency" optionLabel="label"
                         optionValue="value" styleClass="w-full"></p-dropdown>
           </div>
           <div class="form-group">
             <label>Zona Horaria</label>
-            <p-dropdown [options]="timezones" formControlName="timezone" optionLabel="label" 
+            <p-dropdown [options]="timezones" formControlName="timezone" optionLabel="label"
                         optionValue="value" [filter]="true" styleClass="w-full"></p-dropdown>
           </div>
         </div>
@@ -192,8 +192,14 @@ export class OrganizationsComponent implements OnInit {
     this.saving.set(true);
 
     this.orgService.create(this.form.value).subscribe({
-      next: () => {
+      next: (response) => {
         this.messageService.add({ severity: 'success', summary: 'Éxito', detail: 'Organización creada' });
+        // Al crear una organización, el usuario es OWNER
+        this.orgService.setCurrentMembership({
+          role: 'OWNER',
+          userId: '',
+          organizationId: response.data.id
+        } as any);
         this.dialogVisible = false;
         this.saving.set(false);
       },
