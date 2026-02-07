@@ -38,6 +38,7 @@ export class TransactionsService {
     this.validateTransactionAccounts(dto);
 
     const amount = BigInt(dto.amount);
+    const reference = dto.reference?.trim() || this.generateReference();
 
     // Use transaction for atomic operations
     const transaction = await this.prisma.$transaction(async (tx) => {
@@ -50,7 +51,7 @@ export class TransactionsService {
           amount,
           currency: dto.currency || 'USD',
           description: dto.description,
-          reference: dto.reference,
+          reference,
           categoryId: dto.categoryId,
           fromAccountId: dto.fromAccountId,
           toAccountId: dto.toAccountId,
@@ -409,5 +410,14 @@ export class TransactionsService {
         createdAt: a.createdAt,
       })),
     };
+  }
+
+  private generateReference(): string {
+    const now = new Date();
+    const datePart = `${now.getFullYear()}${String(now.getMonth() + 1).padStart(2, '0')}${String(
+        now.getDate(),
+    ).padStart(2, '0')}`;
+    const randomPart = Math.floor(1000 + Math.random() * 9000);
+    return `TRX-${datePart}-${randomPart}`;
   }
 }
