@@ -168,41 +168,28 @@ import { LoadingComponent, EmptyStateComponent } from '../../../shared/component
 
       <!-- Table Card -->
       <div class="bg-white rounded-2xl border border-gray-100 shadow-sm overflow-hidden">
-        @if (isLoading()) {
-          <div class="p-8">
-            <app-loading></app-loading>
-          </div>
-        } @else if (transactions().length === 0) {
-          <div class="p-8">
-            <app-empty-state
-                icon="pi-arrow-right-arrow-left"
-                title="Sin transacciones"
-                message="No hay transacciones que coincidan con los filtros seleccionados"
-                actionLabel="Nueva Transacción"
-                [action]="goToNew">
-            </app-empty-state>
-          </div>
-        } @else {
+        <div class="relative">
           <p-table
               [value]="transactions()"
               [paginator]="true"
-              [rows]="10"
+              [rows]="filters.limit || 10"
               [totalRecords]="totalCount()"
               [lazy]="true"
+              [loading]="isLoading()"
               (onLazyLoad)="onLazyLoad($event)"
               [rowHover]="true"
-              styleClass="p-datatable-sm"
-              [tableStyle]="{'min-width': '60rem'}">
+              styleClass="p-datatable-sm transactions-table"
+              [tableStyle]="{'min-width': '58rem'}">
             <ng-template pTemplate="header">
               <tr>
-                <th style="width: 140px">Fecha</th>
-                <th>Descripción</th>
-                <th style="width: 140px">Categoría</th>
-                <th style="width: 180px">Cuenta</th>
-                <th style="width: 100px">Tipo</th>
-                <th style="width: 100px">Estado</th>
-                <th style="width: 130px" class="text-right">Monto</th>
-                <th style="width: 100px" class="text-center">Acciones</th>
+                <th style="width: 150px">Fecha</th>
+                <th class="min-w-[240px]">Descripción</th>
+                <th style="width: 160px">Categoría</th>
+                <th style="width: 200px">Cuenta</th>
+                <th style="width: 110px">Tipo</th>
+                <th style="width: 110px">Estado</th>
+                <th style="width: 140px" class="text-right">Monto</th>
+                <th style="width: 110px" class="text-center">Acciones</th>
               </tr>
             </ng-template>
             <ng-template pTemplate="body" let-txn>
@@ -214,10 +201,12 @@ import { LoadingComponent, EmptyStateComponent } from '../../../shared/component
                   </div>
                 </td>
                 <td>
-                  <div class="flex flex-col min-w-0">
-                    <span class="font-medium text-gray-800 truncate">{{ txn.description || 'Sin descripción' }}</span>
+                  <div class="flex flex-col min-w-0 gap-1">
+                    <span class="font-medium text-gray-800 break-words leading-snug">
+                      {{ txn.description || 'Sin descripción' }}
+                    </span>
                     @if (txn.reference) {
-                      <span class="text-xs text-gray-400 font-mono">{{ txn.reference }}</span>
+                      <span class="text-xs text-gray-400 font-mono truncate">{{ txn.reference }}</span>
                     }
                   </div>
                 </td>
@@ -235,18 +224,18 @@ import { LoadingComponent, EmptyStateComponent } from '../../../shared/component
                     @if (txn.type === 'INCOME') {
                       <span class="flex items-center gap-1">
                         <i class="pi pi-arrow-down text-emerald-500 text-xs"></i>
-                        {{ txn.toAccountName }}
+                        <span class="truncate">{{ txn.toAccountName }}</span>
                       </span>
                     } @else if (txn.type === 'EXPENSE') {
                       <span class="flex items-center gap-1">
                         <i class="pi pi-arrow-up text-rose-500 text-xs"></i>
-                        {{ txn.fromAccountName }}
+                        <span class="truncate">{{ txn.fromAccountName }}</span>
                       </span>
                     } @else {
                       <span class="flex items-center gap-1 text-xs">
-                        {{ txn.fromAccountName }}
+                        <span class="truncate">{{ txn.fromAccountName }}</span>
                         <i class="pi pi-arrow-right text-indigo-500"></i>
-                        {{ txn.toAccountName }}
+                        <span class="truncate">{{ txn.toAccountName }}</span>
                       </span>
                     }
                   </div>
@@ -300,8 +289,26 @@ import { LoadingComponent, EmptyStateComponent } from '../../../shared/component
                 </td>
               </tr>
             </ng-template>
+            <ng-template pTemplate="emptymessage">
+              <tr>
+                <td colspan="8" class="py-10">
+                  <app-empty-state
+                      icon="pi-arrow-right-arrow-left"
+                      title="Sin transacciones"
+                      message="No hay transacciones que coincidan con los filtros seleccionados"
+                      actionLabel="Nueva Transacción"
+                      [action]="goToNew">
+                  </app-empty-state>
+                </td>
+              </tr>
+            </ng-template>
           </p-table>
-        }
+          @if (isLoading()) {
+            <div class="absolute inset-0 bg-white/70 backdrop-blur-[1px] flex items-center justify-center">
+              <app-loading></app-loading>
+            </div>
+          }
+        </div>
       </div>
     </div>
 
@@ -312,11 +319,11 @@ import { LoadingComponent, EmptyStateComponent } from '../../../shared/component
   `,
   styles: [`
     :host ::ng-deep {
-      .p-datatable .p-datatable-tbody > tr > td {
-        padding: 1rem;
+      .transactions-table .p-datatable-tbody > tr > td,
+      .transactions-table .p-datatable-thead > tr > th {
+        padding: 0.85rem 1rem;
       }
-      
-      .p-datatable .p-datatable-tbody > tr {
+          .transactions-table .p-datatable-tbody > tr {
         transition: background 0.15s ease;
       }
     }
@@ -338,7 +345,7 @@ export class TransactionsListComponent implements OnInit {
   totalCount = this.transactionService.totalCount;
   categories = this.categoryService.activeCategories;
 
-  filters: TransactionFilter = {};
+  filters: TransactionFilter = { page: 1, limit: 10 };
 
   typeOptions = [
     { label: 'Ingreso', value: 'INCOME' },
@@ -360,6 +367,7 @@ export class TransactionsListComponent implements OnInit {
   }
 
   loadData(): void {
+    if (this.isLoading()) return;
     this.transactionService.getAll(this.filters).subscribe();
   }
 
@@ -369,13 +377,17 @@ export class TransactionsListComponent implements OnInit {
   }
 
   clearFilters(): void {
-    this.filters = {};
+    this.filters = { page: 1, limit: this.filters.limit || 10 };
     this.loadData();
   }
 
   onLazyLoad(event: any): void {
-    this.filters.page = Math.floor(event.first / event.rows) + 1;
-    this.filters.limit = event.rows;
+    const rows = event.rows ?? this.filters.limit ?? 10;
+    const first = event.first ?? 0;
+    const nextPage = Math.floor(first / rows) + 1;
+    if (nextPage === this.filters.page && rows === this.filters.limit) return;
+    this.filters.page = nextPage;
+    this.filters.limit = rows;
     this.loadData();
   }
 

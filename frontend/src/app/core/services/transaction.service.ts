@@ -1,6 +1,6 @@
 import { Injectable, signal } from '@angular/core';
 import { HttpClient, HttpParams } from '@angular/common/http';
-import { Observable, tap } from 'rxjs';
+import { Observable, finalize, tap } from 'rxjs';
 import { environment } from '../../../environments/environment';
 import { 
   Transaction, 
@@ -63,8 +63,8 @@ export class TransactionService {
       tap(response => {
         this._transactions.set(response.data.data);
         this._totalCount.set(response.data.meta.total);
-        this._isLoading.set(false);
-      })
+      }),
+        finalize(() => this._isLoading.set(false))
     );
   }
 

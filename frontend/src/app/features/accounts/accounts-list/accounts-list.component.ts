@@ -52,30 +52,34 @@ import { MoneyPipe } from '../../../shared/pipes';
 
       <!-- Table -->
       <p-card>
-        <p-table [value]="accounts()" [rowHover]="true" styleClass="p-datatable-sm">
+        <p-table
+            [value]="accounts()"
+            [rowHover]="true"
+            styleClass="p-datatable-sm accounts-table"
+            [tableStyle]="{ 'min-width': '52rem' }">
           <ng-template pTemplate="header">
             <tr>
-              <th>Nombre</th>
-              <th>Tipo</th>
-              <th class="text-right">Balance Inicial</th>
-              <th class="text-right">Balance Actual</th>
-              <th>Estado</th>
-              <th class="text-center">Acciones</th>
+              <th class="min-w-[260px]">Nombre</th>
+              <th class="min-w-[120px]">Tipo</th>
+              <th class="text-right min-w-[140px]">Balance Inicial</th>
+              <th class="text-right min-w-[140px]">Balance Actual</th>
+              <th class="min-w-[110px]">Estado</th>
+              <th class="text-center min-w-[120px]">Acciones</th>
             </tr>
           </ng-template>
           <ng-template pTemplate="body" let-account>
             <tr>
-              <td>
+              <td class="align-top">
                 <div class="flex items-center gap-3">
                   <!-- CORRECCIÓN: Tamaño fijo para el indicador de color -->
-                  <div class="w-8 h-8 rounded-lg flex items-center justify-center flex-shrink-0"
+                  <div class="w-9 h-9 rounded-xl flex items-center justify-center flex-shrink-0"
                        [style.background-color]="getColorWithOpacity(account.color || '#3b82f6', 0.2)">
-                    <i class="pi" [class]="account.icon || 'pi-wallet'"
+                    <i [class]="'pi ' + (account.icon || 'pi-wallet') + ' text-sm'"
                        [style.color]="account.color || '#3b82f6'"></i>
                   </div>
                   <div class="min-w-0">
-                    <p class="font-medium truncate">{{ account.name }}</p>
-                    <p class="text-xs text-gray-500 truncate">{{ account.description }}</p>
+                    <p class="font-semibold text-gray-800 leading-snug break-words">{{ account.name }}</p>
+                    <p class="text-xs text-gray-500 truncate">{{ account.description || 'Sin descripción' }}</p>
                   </div>
                 </div>
               </td>
@@ -220,6 +224,12 @@ import { MoneyPipe } from '../../../shared/pipes';
       /* Asegurar que el dropdown se muestre correctamente */
       .p-dropdown-panel {
         z-index: 9999 !important;
+      }
+
+      .accounts-table .p-datatable-thead > tr > th,
+      .accounts-table .p-datatable-tbody > tr > td {
+        padding: 0.85rem 1rem;
+        vertical-align: top;
       }
       
       /* Color picker nativo styling */
