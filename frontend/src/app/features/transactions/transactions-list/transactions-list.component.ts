@@ -68,9 +68,22 @@ import { LoadingComponent, EmptyStateComponent } from '../../../shared/component
 
       <!-- Filters Card -->
       <div class="bg-white rounded-2xl border border-gray-100 shadow-sm p-5 mb-6">
-        <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-5 gap-4">
-          <!-- Search -->
+        <div class="flex flex-col lg:flex-row lg:items-center lg:justify-between gap-3 mb-5">
           <div>
+            <h2 class="text-sm font-semibold text-gray-800">Filtros de transacciones</h2>
+            <p class="text-xs text-gray-500 mt-1">Busca movimientos por descripción, categoría o rango de fechas.</p>
+          </div>
+          <button
+              class="text-sm text-gray-500 hover:text-gray-700 font-medium flex items-center gap-1.5 transition-colors self-start lg:self-center"
+              (click)="clearFilters()">
+            <i class="pi pi-filter-slash text-xs"></i>
+            Limpiar filtros
+          </button>
+        </div>
+
+        <div class="grid grid-cols-1 md:grid-cols-2 xl:grid-cols-6 gap-4">
+          <!-- Search -->
+          <div class="xl:col-span-2">
             <label class="block text-xs font-semibold text-gray-500 uppercase tracking-wide mb-2">Buscar</label>
             <span class="p-input-icon-left w-full">
               <i class="pi pi-search text-gray-400"></i>
@@ -128,41 +141,31 @@ import { LoadingComponent, EmptyStateComponent } from '../../../shared/component
             </p-dropdown>
           </div>
 
-          <!-- Date From -->
-          <div>
-            <label class="block text-xs font-semibold text-gray-500 uppercase tracking-wide mb-2">Desde</label>
-            <p-calendar
-                [(ngModel)]="filters.startDate"
-                dateFormat="dd/mm/yy"
-                [showIcon]="true"
-                styleClass="w-full"
-                placeholder="Fecha inicio"
-                (onSelect)="applyFilters()">
-            </p-calendar>
+          <!-- Date Range -->
+          <div class="xl:col-span-2 grid grid-cols-1 sm:grid-cols-2 gap-3">
+            <div>
+              <label class="block text-xs font-semibold text-gray-500 uppercase tracking-wide mb-2">Desde</label>
+              <p-calendar
+                  [(ngModel)]="filters.startDate"
+                  dateFormat="dd/mm/yy"
+                  [showIcon]="true"
+                  styleClass="w-full"
+                  placeholder="Fecha inicio"
+                  (onSelect)="applyFilters()">
+              </p-calendar>
+            </div>
+            <div>
+              <label class="block text-xs font-semibold text-gray-500 uppercase tracking-wide mb-2">Hasta</label>
+              <p-calendar
+                  [(ngModel)]="filters.endDate"
+                  dateFormat="dd/mm/yy"
+                  [showIcon]="true"
+                  styleClass="w-full"
+                  placeholder="Fecha fin"
+                  (onSelect)="applyFilters()">
+              </p-calendar>
+            </div>
           </div>
-
-          <!-- Date To -->
-          <div>
-            <label class="block text-xs font-semibold text-gray-500 uppercase tracking-wide mb-2">Hasta</label>
-            <p-calendar
-                [(ngModel)]="filters.endDate"
-                dateFormat="dd/mm/yy"
-                [showIcon]="true"
-                styleClass="w-full"
-                placeholder="Fecha fin"
-                (onSelect)="applyFilters()">
-            </p-calendar>
-          </div>
-        </div>
-
-        <!-- Clear Filters -->
-        <div class="flex justify-end mt-4 pt-4 border-t border-gray-100">
-          <button
-              class="text-sm text-gray-500 hover:text-gray-700 font-medium flex items-center gap-1.5 transition-colors"
-              (click)="clearFilters()">
-            <i class="pi pi-filter-slash text-xs"></i>
-            Limpiar filtros
-          </button>
         </div>
       </div>
 

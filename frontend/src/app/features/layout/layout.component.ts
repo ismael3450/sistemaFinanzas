@@ -40,12 +40,12 @@ interface NavItem {
           [class.w-[72px]]="sidebarCollapsed()">
 
         <!-- Logo Section -->
-        <div class="h-16 flex items-center px-5 border-b border-gray-100"
+        <div class="h-16 flex items-center px-5 border-b border-gray-100 bg-white"
              [class.justify-center]="sidebarCollapsed()"
              [class.justify-between]="!sidebarCollapsed()">
           @if (!sidebarCollapsed()) {
             <div class="flex items-center gap-3">
-              <div class="w-9 h-9 bg-gradient-to-br from-indigo-500 to-purple-600 rounded-xl flex items-center justify-center shadow-md shadow-indigo-200">
+              <div class="w-9 h-9 bg-gradient-to-br from-indigo-500 to-purple-600 rounded-full flex items-center justify-center shadow-md shadow-indigo-200">
                 <i class="pi pi-chart-line text-white text-sm"></i>
               </div>
               <div>
@@ -54,8 +54,7 @@ interface NavItem {
               </div>
             </div>
           } @else {
-            <div class="w-9 h-9 bg-gradient-to-br from-indigo-500 to-purple-600 rounded-xl flex items-center justify-center shadow-md shadow-indigo-200">
-              <i class="pi pi-chart-line text-white text-sm"></i>
+            <div class="w-9 h-9 bg-gradient-to-br from-indigo-500 to-purple-600 rounded-full flex items-center justify-center shadow-md shadow-indigo-200">              <i class="pi pi-chart-line text-white text-sm"></i>
             </div>
           }
           <button
@@ -69,13 +68,13 @@ interface NavItem {
 
         <!-- Organization Selector -->
         @if (!sidebarCollapsed() && activeOrg()) {
-          <div class="p-4">
+          <div class="p-4 pt-5">
             <button
                 pRipple
-                class="w-full flex items-center gap-3 p-3 rounded-xl bg-gradient-to-r from-gray-50 to-gray-100/50 hover:from-gray-100 hover:to-gray-100 transition-all duration-200 border border-gray-100"
+                class="w-full flex items-center gap-3 p-3 rounded-2xl bg-gradient-to-r from-gray-50 to-white hover:from-gray-100 hover:to-gray-50 transition-all duration-200 border border-gray-100 shadow-sm"                }
                 (click)="goToOrganizations()">
-              <div class="w-10 h-10 bg-gradient-to-br from-indigo-100 to-purple-100 rounded-lg flex items-center justify-center flex-shrink-0">
-                <span class="text-indigo-600 font-bold text-sm">{{ orgInitials() }}</span>
+              <div class="w-10 h-10 bg-gradient-to-br from-indigo-100 to-purple-100 rounded-full flex items-center justify-center flex-shrink-0 ring-2 ring-white">
+                <span class="text-indigo-600 font-semibold text-sm">{{ orgInitials() }}</span>
               </div>
               <div class="flex-1 text-left overflow-hidden min-w-0">
                 <p class="font-semibold text-gray-800 text-sm truncate">{{ activeOrg()?.name }}</p>
@@ -87,7 +86,7 @@ interface NavItem {
         }
 
         <!-- Navigation -->
-        <nav class="px-3 py-2 space-y-1 overflow-y-auto"
+        <nav class="px-3 pb-4 space-y-1 overflow-y-auto"
              [style.height]="sidebarCollapsed() ? 'calc(100vh - 80px)' : 'calc(100vh - 180px)'">
           @if (!sidebarCollapsed()) {
             <p class="px-3 pb-2 text-[11px] uppercase tracking-[0.16em] text-gray-400 font-semibold">
@@ -101,12 +100,10 @@ interface NavItem {
                   [routerLink]="item.route"
                   routerLinkActive="nav-active"
                   [routerLinkActiveOptions]="{ exact: item.route === '/dashboard' }"
-                  class="group flex items-center gap-3 px-3 py-2.5 rounded-2xl text-gray-500 hover:text-gray-700 hover:bg-gray-50 transition-all duration-200 w-full"
-                  [class.justify-center]="sidebarCollapsed()"
+                  class="group flex items-center gap-3 px-3 py-2.5 rounded-2xl text-gray-500 hover:text-gray-700 hover:bg-gray-50 transition-all duration-200 w-full border border-transparent hover:border-gray-100"                  [class.justify-center]="sidebarCollapsed()"
                   [pTooltip]="sidebarCollapsed() ? item.label : ''"
                   tooltipPosition="right">
-                <div class="w-9 h-9 rounded-xl flex items-center justify-center transition-colors group-hover:bg-white/70 group-hover:shadow-sm">
-                  <i [class]="'pi ' + item.icon + ' text-[15px]'"></i>
+                <div class="w-9 h-9 rounded-xl flex items-center justify-center transition-colors group-hover:bg-white group-hover:shadow-sm">                  <i [class]="'pi ' + item.icon + ' text-[15px]'"></i>
                 </div>
                 @if (!sidebarCollapsed()) {
                   <span class="font-medium text-sm">{{ item.label }}</span>
@@ -136,15 +133,15 @@ interface NavItem {
           [class.ml-[72px]]="sidebarCollapsed()">
 
         <!-- Top Header -->
-        <header class="h-16 bg-white/80 backdrop-blur-md border-b border-gray-100 flex items-center justify-between px-6 sticky top-0 z-30">
-          <div class="flex items-center gap-4">
+        <header class="h-16 bg-white/90 backdrop-blur-md border-b border-gray-100 shadow-sm flex items-center justify-between px-6 sticky top-0 z-30">          <div class="flex items-center gap-4">
             <button
                 pRipple
                 class="lg:hidden p-2 rounded-lg hover:bg-gray-50 text-gray-600"
                 (click)="toggleSidebar()">
               <i class="pi pi-bars"></i>
             </button>
-            <div>
+          <div class="flex flex-col">
+            <span class="text-[10px] uppercase tracking-[0.2em] text-gray-400">Sección</span>
               <h1 class="text-lg font-semibold text-gray-900 tracking-tight">{{ pageTitle() }}</h1>
             </div>
           </div>
@@ -172,9 +169,9 @@ interface NavItem {
             <div class="relative">
               <button
                   pRipple
-                  class="flex items-center gap-3 p-1.5 pr-3 rounded-xl hover:bg-gray-50 transition-colors"
+                  class="flex items-center gap-3 p-1.5 pr-3 rounded-2xl hover:bg-gray-50 transition-colors border border-transparent hover:border-gray-100"                  
                   (click)="userMenu.toggle($event)">
-                <div class="w-9 h-9 bg-gradient-to-br from-indigo-400 to-purple-500 rounded-xl flex items-center justify-center text-white font-semibold text-sm shadow-sm">
+                <div class="w-9 h-9 bg-gradient-to-br from-indigo-400 to-purple-500 rounded-full flex items-center justify-center text-white font-semibold text-sm shadow-sm ring-2 ring-white">                  
                   {{ userInitials() }}
                 </div>
                 <div class="text-left hidden sm:block">
