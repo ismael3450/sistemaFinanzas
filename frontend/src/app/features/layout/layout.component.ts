@@ -87,7 +87,7 @@ interface NavItem {
         }
 
         <!-- Navigation -->
-        <nav class="px-3 pb-4 space-y-1 overflow-y-auto"
+        <nav class="px-2 pb-3 space-y-1 overflow-y-auto"
              [style.height]="sidebarCollapsed() ? 'calc(100vh - 80px)' : 'calc(100vh - 180px)'">
           @if (!sidebarCollapsed()) {
             <p class="px-3 pb-2 text-[11px] uppercase tracking-[0.16em] text-gray-400 font-semibold">
@@ -101,12 +101,12 @@ interface NavItem {
                   [routerLink]="item.route"
                   routerLinkActive="nav-active"
                   [routerLinkActiveOptions]="{ exact: item.route === '/dashboard' }"
-                  class="group flex items-center gap-3 px-3 py-2.5 rounded-2xl text-gray-500 hover:text-gray-700 hover:bg-gray-50 transition-all duration-200 w-full border border-transparent hover:border-gray-100"                  
+                  class="group flex items-center gap-1 px-3 py-2 rounded-lg text-gray-500 hover:text-gray-700 hover:bg-gray-50 transition-all duration-200 w-full"
                   [class.justify-center]="sidebarCollapsed()"
                   [pTooltip]="sidebarCollapsed() ? item.label : ''"
                   tooltipPosition="right">
-                  <div class="w-9 h-9 rounded-xl flex items-center justify-center transition-colors group-hover:bg-white group-hover:shadow-sm flex-shrink-0">
-                    <i [class]="'pi ' + item.icon + ' text-[15px] leading-none'"></i>
+                  <div class="w-5 h-5 flex items-center justify-center flex-shrink-0">
+                  <i [class]="'pi ' + item.icon + ' text-[15px] leading-none'"></i>
                 </div>
                 @if (!sidebarCollapsed()) {
                   <span class="font-medium text-sm leading-5">{{ item.label }}</span>
