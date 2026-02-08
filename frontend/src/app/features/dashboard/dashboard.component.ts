@@ -7,11 +7,11 @@ import { TableModule } from 'primeng/table';
 import { TagModule } from 'primeng/tag';
 import { SkeletonModule } from 'primeng/skeleton';
 import { NgApexchartsModule } from 'ng-apexcharts';
-import { 
-  ReportService, 
-  TransactionService, 
+import {
+  ReportService,
+  TransactionService,
   AccountService,
-  OrganizationService 
+  OrganizationService
 } from '../../core/services';
 import { StatCardComponent, LoadingComponent } from '../../shared/components';
 import { MoneyPipe, DateAgoPipe } from '../../shared/pipes';
@@ -36,16 +36,16 @@ import { Transaction, PeriodSummary, TrendsReport } from '../../core/models';
   template: `
     <div class="page-container">
       <!-- Header -->
-      <div class="page-header">
+      <div class="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-3 mb-6">
         <div>
-          <h1>Dashboard</h1>
-          <p class="text-gray-500 mt-1">Bienvenido, {{ userName() }}</p>
+          <h1 class="text-xl font-bold">Dashboard</h1>
+          <p class="text-gray-500 mt-1 text-sm">Bienvenido, {{ userName() }}</p>
         </div>
         <div class="flex gap-2">
-          <p-button 
-            label="Nueva Transacción" 
-            icon="pi pi-plus"
-            routerLink="/transactions/new">
+          <p-button
+              label="Nueva Transacción"
+              icon="pi pi-plus"
+              routerLink="/transactions/new">
           </p-button>
         </div>
       </div>
@@ -62,31 +62,31 @@ import { Transaction, PeriodSummary, TrendsReport } from '../../core/models';
       } @else {
         <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6 mb-6">
           <app-stat-card
-            label="Balance Total"
-            [value]="totalBalance() | money:currency()"
-            icon="pi-wallet"
-            color="info">
+              label="Balance Total"
+              [value]="totalBalance() | money:currency()"
+              icon="pi-wallet"
+              color="info">
           </app-stat-card>
-          
+
           <app-stat-card
-            label="Ingresos del Período"
-            [value]="summary()?.totalIncome | money:currency()"
-            icon="pi-arrow-down"
-            color="success">
+              label="Ingresos del Período"
+              [value]="summary()?.totalIncome | money:currency()"
+              icon="pi-arrow-down"
+              color="success">
           </app-stat-card>
-          
+
           <app-stat-card
-            label="Egresos del Período"
-            [value]="summary()?.totalExpense | money:currency()"
-            icon="pi-arrow-up"
-            color="danger">
+              label="Egresos del Período"
+              [value]="summary()?.totalExpense | money:currency()"
+              icon="pi-arrow-up"
+              color="danger">
           </app-stat-card>
-          
+
           <app-stat-card
-            label="Balance Neto"
-            [value]="summary()?.netBalance | money:currency()"
-            icon="pi-chart-line"
-            [color]="netBalanceColor()">
+              label="Balance Neto"
+              [value]="summary()?.netBalance | money:currency()"
+              icon="pi-chart-line"
+              [color]="netBalanceColor()">
           </app-stat-card>
         </div>
       }
@@ -97,13 +97,13 @@ import { Transaction, PeriodSummary, TrendsReport } from '../../core/models';
         <p-card header="Tendencia de Ingresos y Egresos">
           @if (trendsReport()) {
             <apx-chart
-              [series]="trendChartSeries()"
-              [chart]="trendChartOptions.chart"
-              [xaxis]="trendChartOptions.xaxis"
-              [stroke]="trendChartOptions.stroke"
-              [colors]="trendChartOptions.colors"
-              [dataLabels]="trendChartOptions.dataLabels"
-              [legend]="trendChartOptions.legend">
+                [series]="trendChartSeries()"
+                [chart]="trendChartOptions.chart"
+                [xaxis]="trendChartOptions.xaxis"
+                [stroke]="trendChartOptions.stroke"
+                [colors]="trendChartOptions.colors"
+                [dataLabels]="trendChartOptions.dataLabels"
+                [legend]="trendChartOptions.legend">
             </apx-chart>
           } @else {
             <app-loading height="300px"></app-loading>
@@ -114,21 +114,21 @@ import { Transaction, PeriodSummary, TrendsReport } from '../../core/models';
         <p-card header="Balance por Cuenta">
           @if (balances().length > 0) {
             <apx-chart
-              [series]="accountChartSeries()"
-              [chart]="accountChartOptions.chart"
-              [labels]="accountChartLabels()"
-              [colors]="accountChartOptions.colors"
-              [legend]="accountChartOptions.legend"
-              [dataLabels]="accountChartOptions.dataLabels">
+                [series]="accountChartSeries()"
+                [chart]="accountChartOptions.chart"
+                [labels]="accountChartLabels()"
+                [colors]="accountChartOptions.colors"
+                [legend]="accountChartOptions.legend"
+                [dataLabels]="accountChartOptions.dataLabels">
             </apx-chart>
           } @else {
             <div class="flex flex-col items-center justify-center py-12">
               <i class="pi pi-wallet text-4xl text-gray-300 mb-4"></i>
               <p class="text-gray-500">No hay cuentas registradas</p>
-              <p-button 
-                label="Crear Cuenta" 
-                styleClass="mt-4"
-                routerLink="/accounts/new">
+              <p-button
+                  label="Crear Cuenta"
+                  styleClass="mt-4"
+                  routerLink="/accounts/new">
               </p-button>
             </div>
           }
@@ -140,21 +140,21 @@ import { Transaction, PeriodSummary, TrendsReport } from '../../core/models';
         <ng-template pTemplate="header">
           <div class="flex justify-between items-center px-4 pt-4">
             <h3 class="text-lg font-semibold">Transacciones Recientes</h3>
-            <p-button 
-              label="Ver Todas" 
-              [text]="true"
-              routerLink="/transactions">
+            <p-button
+                label="Ver Todas"
+                [text]="true"
+                routerLink="/transactions">
             </p-button>
           </div>
         </ng-template>
 
         @if (recentTransactions().length > 0) {
-          <p-table [value]="recentTransactions()" [rows]="5" styleClass="p-datatable-sm">
+          <p-table [value]="recentTransactions()" [rows]="5" styleClass="p-datatable-sm" [responsive]="true">
             <ng-template pTemplate="header">
               <tr>
                 <th>Fecha</th>
                 <th>Descripción</th>
-                <th>Categoría</th>
+                <th class="hidden sm:table-cell">Categoría</th>
                 <th>Tipo</th>
                 <th class="text-right">Monto</th>
               </tr>
@@ -167,20 +167,20 @@ import { Transaction, PeriodSummary, TrendsReport } from '../../core/models';
                 <td>
                   <span class="font-medium">{{ txn.description || 'Sin descripción' }}</span>
                 </td>
-                <td>
+                <td class="hidden sm:table-cell">
                   <span class="text-gray-600">{{ txn.categoryName || '-' }}</span>
                 </td>
                 <td>
-                  <p-tag 
-                    [value]="getTypeLabel(txn.type)" 
-                    [severity]="getTypeSeverity(txn.type)">
+                  <p-tag
+                      [value]="getTypeLabel(txn.type)"
+                      [severity]="getTypeSeverity(txn.type)">
                   </p-tag>
                 </td>
                 <td class="text-right">
-                  <span 
-                    class="font-semibold"
-                    [class.text-green-600]="txn.type === 'INCOME'"
-                    [class.text-red-600]="txn.type === 'EXPENSE'">
+                  <span
+                      class="font-semibold"
+                      [class.text-green-600]="txn.type === 'INCOME'"
+                      [class.text-red-600]="txn.type === 'EXPENSE'">
                     {{ txn.type === 'INCOME' ? '+' : '-' }}{{ txn.amount | money:txn.currency }}
                   </span>
                 </td>
@@ -199,10 +199,10 @@ import { Transaction, PeriodSummary, TrendsReport } from '../../core/models';
           <div class="flex flex-col items-center justify-center py-12">
             <i class="pi pi-inbox text-4xl text-gray-300 mb-4"></i>
             <p class="text-gray-500">No hay transacciones registradas</p>
-            <p-button 
-              label="Nueva Transacción" 
-              styleClass="mt-4"
-              routerLink="/transactions/new">
+            <p-button
+                label="Nueva Transacción"
+                styleClass="mt-4"
+                routerLink="/transactions/new">
             </p-button>
           </div>
         }

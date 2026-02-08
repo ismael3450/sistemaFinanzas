@@ -14,10 +14,10 @@ import { AppModule } from './app.module';
 
 async function bootstrap() {
   const app = await NestFactory.create<NestFastifyApplication>(
-    AppModule,
-    new FastifyAdapter({
-      logger: true,
-    }),
+      AppModule,
+      new FastifyAdapter({
+        logger: true,
+      }),
   );
 
   const configService = app.get(ConfigService);
@@ -27,13 +27,20 @@ async function bootstrap() {
     secret: configService.getOrThrow<string>('JWT_SECRET'),
   });
 
+  // CORS - permitir frontend de Vercel y desarrollo local
+  const allowedOrigins = configService.get<string>('CORS_ORIGINS')
+      ? configService.get<string>('CORS_ORIGINS')!.split(',').map(o => o.trim())
+      : true;
+
   await app.register(fastifyCors, {
-    origin: true,
+    origin: allowedOrigins,
     credentials: true,
   });
 
+  // En producción Fly.io, helmet puede ser más relajado ya que el frontend es un dominio separado
+  const isProduction = configService.get('NODE_ENV') === 'production';
   await app.register(fastifyHelmet, {
-    contentSecurityPolicy: {
+    contentSecurityPolicy: isProduction ? false : {
       directives: {
         defaultSrc: ["'self'"],
         styleSrc: ["'self'", "'unsafe-inline'"],
@@ -61,21 +68,22 @@ async function bootstrap() {
 
   // Global validation pipe
   app.useGlobalPipes(
-    new ValidationPipe({
-      whitelist: true,
-      forbidNonWhitelisted: true,
-      transform: true,
-      transformOptions: {
-        enableImplicitConversion: true,
-      },
-    }),
+      new ValidationPipe({
+        whitelist: true,
+        forbidNonWhitelisted: true,
+        transform: true,
+        transformOptions: {
+          enableImplicitConversion: true,
+        },
+      }),
   );
 
-  // Swagger documentation
-  const config = new DocumentBuilder()
-    .setTitle('Financial Control API')
-    .setDescription(
-      `
+  // Swagger documentation (solo en desarrollo o si se habilita explícitamente)
+  if (!isProduction || configService.get('ENABLE_SWAGGER') === 'true') {
+    const config = new DocumentBuilder()
+        .setTitle('Financial Control API')
+        .setDescription(
+            `
       ## Sistema de Control Financiero Multiorganización
       
       API REST para el control general de dinero (entradas/salidas) aplicable a:
@@ -97,40 +105,41 @@ async function bootstrap() {
       Los montos se almacenan en **minor units** (centavos).
       Ejemplo: $10.50 → 1050
       `,
-    )
-    .setVersion('1.0')
-    .addBearerAuth(
-      {
-        type: 'http',
-        scheme: 'bearer',
-        bearerFormat: 'JWT',
-        name: 'JWT',
-        description: 'Enter JWT token',
-        in: 'header',
-      },
-      'JWT-auth',
-    )
-    .addTag('Auth', 'Authentication endpoints')
-    .addTag('Organizations', 'Organization management')
-    .addTag('Membership', 'User membership and roles')
-    .addTag('Accounts', 'Financial accounts management')
-    .addTag('Categories', 'Transaction categories')
-    .addTag('Payment Methods', 'Payment methods management')
-    .addTag('Transactions', 'Financial transactions')
-    .addTag('Reports', 'Financial reports')
-    .addTag('Exports', 'Data export functionality')
-    .addTag('Audit', 'Audit logs')
-    .addTag('Subscriptions', 'Subscription plans and Wompi integration')
-    .build();
+        )
+        .setVersion('1.0')
+        .addBearerAuth(
+            {
+              type: 'http',
+              scheme: 'bearer',
+              bearerFormat: 'JWT',
+              name: 'JWT',
+              description: 'Enter JWT token',
+              in: 'header',
+            },
+            'JWT-auth',
+        )
+        .addTag('Auth', 'Authentication endpoints')
+        .addTag('Organizations', 'Organization management')
+        .addTag('Membership', 'User membership and roles')
+        .addTag('Accounts', 'Financial accounts management')
+        .addTag('Categories', 'Transaction categories')
+        .addTag('Payment Methods', 'Payment methods management')
+        .addTag('Transactions', 'Financial transactions')
+        .addTag('Reports', 'Financial reports')
+        .addTag('Exports', 'Data export functionality')
+        .addTag('Audit', 'Audit logs')
+        .addTag('Subscriptions', 'Subscription plans and Wompi integration')
+        .build();
 
-  const document = SwaggerModule.createDocument(app, config);
-  SwaggerModule.setup('docs', app, document, {
-    swaggerOptions: {
-      persistAuthorization: true,
-      tagsSorter: 'alpha',
-      operationsSorter: 'alpha',
-    },
-  });
+    const document = SwaggerModule.createDocument(app, config);
+    SwaggerModule.setup('docs', app, document, {
+      swaggerOptions: {
+        persistAuthorization: true,
+        tagsSorter: 'alpha',
+        operationsSorter: 'alpha',
+      },
+    });
+  }
 
   // Start server
   const port = configService.get('PORT') || 3000;

@@ -182,17 +182,17 @@ import { LoadingComponent, EmptyStateComponent } from '../../../shared/component
               (onLazyLoad)="onLazyLoad($event)"
               [rowHover]="true"
               styleClass="p-datatable-sm transactions-table"
-              [tableStyle]="{'min-width': '58rem'}">
+              [tableStyle]="{'min-width': '40rem'}">
             <ng-template pTemplate="header">
               <tr>
-                <th style="width: 150px">Fecha</th>
-                <th class="min-w-[240px]">Descripción</th>
-                <th style="width: 160px">Categoría</th>
-                <th style="width: 200px">Cuenta</th>
-                <th style="width: 110px">Tipo</th>
-                <th style="width: 110px">Estado</th>
-                <th style="width: 140px" class="text-right">Monto</th>
-                <th style="width: 110px" class="text-center">Acciones</th>
+                <th style="width: 120px">Fecha</th>
+                <th class="min-w-[180px]">Descripción</th>
+                <th style="width: 140px" class="hidden md:table-cell">Categoría</th>
+                <th style="width: 160px" class="hidden lg:table-cell">Cuenta</th>
+                <th style="width: 100px">Tipo</th>
+                <th style="width: 100px" class="hidden sm:table-cell">Estado</th>
+                <th style="width: 130px" class="text-right">Monto</th>
+                <th style="width: 90px" class="text-center hidden sm:table-cell">Acciones</th>
               </tr>
             </ng-template>
             <ng-template pTemplate="body" let-txn>
@@ -213,7 +213,7 @@ import { LoadingComponent, EmptyStateComponent } from '../../../shared/component
                     }
                   </div>
                 </td>
-                <td>
+                <td class="hidden md:table-cell">
                   @if (txn.categoryName) {
                     <span class="inline-flex items-center gap-1.5 px-2.5 py-1 rounded-full text-xs font-medium bg-gray-100 text-gray-700">
                       {{ txn.categoryName }}
@@ -222,7 +222,7 @@ import { LoadingComponent, EmptyStateComponent } from '../../../shared/component
                     <span class="text-gray-400">-</span>
                   }
                 </td>
-                <td>
+                <td class="hidden lg:table-cell">
                   <div class="text-sm text-gray-700">
                     @if (txn.type === 'INCOME') {
                       <span class="flex items-center gap-1">
@@ -250,7 +250,7 @@ import { LoadingComponent, EmptyStateComponent } from '../../../shared/component
                     {{ getTypeLabel(txn.type) }}
                   </span>
                 </td>
-                <td>
+                <td class="hidden sm:table-cell">
                   <span class="inline-flex items-center px-2.5 py-1 rounded-full text-xs font-semibold"
                         [class]="getStatusTagClass(txn.status)">
                     {{ getStatusLabel(txn.status) }}
@@ -265,7 +265,7 @@ import { LoadingComponent, EmptyStateComponent } from '../../../shared/component
                     {{ txn.type === 'INCOME' ? '+' : txn.type === 'EXPENSE' ? '-' : '' }}{{ txn.amount | money:txn.currency }}
                   </span>
                 </td>
-                <td class="text-center" (click)="$event.stopPropagation()">
+                <td class="text-center hidden sm:table-cell" (click)="$event.stopPropagation()">
                   <div class="flex justify-center gap-1 opacity-0 group-hover:opacity-100 transition-opacity">
                     <button
                         pButton

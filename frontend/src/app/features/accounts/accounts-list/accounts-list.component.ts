@@ -56,15 +56,15 @@ import { MoneyPipe } from '../../../shared/pipes';
             [value]="accounts()"
             [rowHover]="true"
             styleClass="p-datatable-sm accounts-table"
-            [tableStyle]="{ 'min-width': '52rem' }">
+            [tableStyle]="{ 'min-width': '32rem' }">
           <ng-template pTemplate="header">
             <tr>
-              <th class="min-w-[260px]">Nombre</th>
-              <th class="min-w-[120px]">Tipo</th>
-              <th class="text-right min-w-[140px]">Balance Inicial</th>
-              <th class="text-right min-w-[140px]">Balance Actual</th>
-              <th class="min-w-[110px]">Estado</th>
-              <th class="text-center min-w-[120px]">Acciones</th>
+              <th class="min-w-[200px]">Nombre</th>
+              <th class="min-w-[100px] hidden sm:table-cell">Tipo</th>
+              <th class="text-right min-w-[120px] hidden md:table-cell">Balance Inicial</th>
+              <th class="text-right min-w-[120px]">Balance Actual</th>
+              <th class="min-w-[90px] hidden sm:table-cell">Estado</th>
+              <th class="text-center min-w-[100px]">Acciones</th>
             </tr>
           </ng-template>
           <ng-template pTemplate="body" let-account>
@@ -83,14 +83,14 @@ import { MoneyPipe } from '../../../shared/pipes';
                   </div>
                 </div>
               </td>
-              <td>{{ getTypeLabel(account.accountType) }}</td>
-              <td class="text-right tabular-nums">{{ account.initialBalance | money:account.currency }}</td>
+              <td class="hidden sm:table-cell">{{ getTypeLabel(account.accountType) }}</td>
+              <td class="text-right tabular-nums hidden md:table-cell">{{ account.initialBalance | money:account.currency }}</td>
               <td class="text-right tabular-nums font-semibold"
                   [class.text-green-600]="Number(account.currentBalance) >= 0"
                   [class.text-red-600]="Number(account.currentBalance) < 0">
                 {{ account.currentBalance | money:account.currency }}
               </td>
-              <td>
+              <td class="hidden sm:table-cell">
                 <p-tag [value]="account.isActive ? 'Activa' : 'Inactiva'"
                        [severity]="account.isActive ? 'success' : 'danger'"></p-tag>
               </td>
@@ -231,16 +231,16 @@ import { MoneyPipe } from '../../../shared/pipes';
         padding: 0.85rem 1rem;
         vertical-align: top;
       }
-      
+
       /* Color picker nativo styling */
       input[type="color"] {
         -webkit-appearance: none;
         border: none;
-        
+
         &::-webkit-color-swatch-wrapper {
           padding: 0;
         }
-        
+
         &::-webkit-color-swatch {
           border: 2px solid #e5e7eb;
           border-radius: 0.5rem;

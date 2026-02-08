@@ -24,13 +24,13 @@ import { Organization } from '../../core/models';
     <div class="min-h-screen bg-gray-50 p-6">
       <div class="max-w-4xl mx-auto">
         <!-- Header -->
-        <div class="flex items-center justify-between mb-8">
+        <div class="flex flex-col sm:flex-row sm:items-center justify-between gap-4 mb-8">
           <div>
             <h1 class="text-2xl font-bold text-gray-800">Mis Organizaciones</h1>
-            <p class="text-gray-500">Selecciona o crea una organización para continuar</p>
+            <p class="text-gray-500 text-sm">Selecciona o crea una organización para continuar</p>
           </div>
           <div class="flex gap-2">
-            <p-button icon="pi pi-plus" label="Nueva Organización" (onClick)="openDialog()"></p-button>
+            <p-button icon="pi pi-plus" label="Nueva" (onClick)="openDialog()"></p-button>
             <p-button icon="pi pi-sign-out" severity="secondary" [outlined]="true" pTooltip="Cerrar Sesión"
                       (onClick)="logout()"></p-button>
           </div>
@@ -90,7 +90,8 @@ import { Organization } from '../../core/models';
     </div>
 
     <!-- Create Dialog -->
-    <p-dialog [(visible)]="dialogVisible" header="Nueva Organización" [modal]="true" [style]="{ width: '500px' }">
+    <p-dialog [(visible)]="dialogVisible" header="Nueva Organización" [modal]="true"
+              [style]="{ width: '500px', maxWidth: '95vw' }" [breakpoints]="{ '640px': '95vw' }">
       <form [formGroup]="form" (ngSubmit)="createOrganization()">
         <div class="form-group">
           <label>Nombre *</label>
