@@ -266,7 +266,8 @@ import { TransactionType, Transaction } from '../../../core/models';
                         <span class="text-xs px-2 py-0.5 rounded-full"
                               [class]="getCategoryTypeClass(category.type)">
                           {{ getCategoryTypeLabel(category.type) }}
-                        </span>                      </div>
+                        </span>                      
+                      </div>
                     </ng-template>
                   </p-dropdown>
                 </div>
@@ -274,7 +275,7 @@ import { TransactionType, Transaction } from '../../../core/models';
                 <div class="form-group">
                   <label for="paymentMethodId" class="flex items-center gap-2">
                     <i class="pi pi-credit-card text-gray-400 text-sm"></i>
-                    Método de Pago
+                    {{ paymentMethodLabel() }}
                   </label>
                   <p-dropdown
                       id="paymentMethodId"
@@ -528,6 +529,7 @@ export class TransactionFormComponent implements OnInit {
 
   currency = computed(() => this.orgService.activeOrganization()?.currency || 'USD');
   successDialogTitle = computed(() => this.isEdit() ? 'Transacción actualizada' : 'Transacción registrada');
+  paymentMethodLabel = computed(() => this.selectedType() === 'INCOME' ? 'Método de ingreso' : 'Método de pago');
 
   filteredCategories = computed(() => {
     const type = this.selectedType();

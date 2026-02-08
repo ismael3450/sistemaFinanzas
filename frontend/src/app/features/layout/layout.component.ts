@@ -45,16 +45,17 @@ interface NavItem {
              [class.justify-between]="!sidebarCollapsed()">
           @if (!sidebarCollapsed()) {
             <div class="flex items-center gap-3">
-              <div class="w-9 h-9 bg-gradient-to-br from-indigo-500 to-purple-600 rounded-full flex items-center justify-center shadow-md shadow-indigo-200">
-                <i class="pi pi-chart-line text-white text-sm"></i>
+              <div class="w-10 h-10 bg-gradient-to-br from-indigo-500 to-purple-600 rounded-full flex items-center justify-center shadow-md shadow-indigo-200">
+                <i class="pi pi-chart-line text-white text-base leading-none"></i>
               </div>
-              <div>
+              <div class="flex flex-col leading-tight">
                 <span class="font-bold text-gray-900 text-base tracking-tight">FinControl</span>
                 <span class="text-[10px] text-gray-400 block -mt-0.5">Sistema Financiero</span>
               </div>
             </div>
           } @else {
-            <div class="w-9 h-9 bg-gradient-to-br from-indigo-500 to-purple-600 rounded-full flex items-center justify-center shadow-md shadow-indigo-200">              <i class="pi pi-chart-line text-white text-sm"></i>
+            <div class="w-10 h-10 bg-gradient-to-br from-indigo-500 to-purple-600 rounded-full flex items-center justify-center shadow-md shadow-indigo-200">
+              <i class="pi pi-chart-line text-white text-base leading-none"></i>
             </div>
           }
           <button
@@ -71,13 +72,13 @@ interface NavItem {
           <div class="p-4 pt-5">
             <button
                 pRipple
-                class="w-full flex items-center gap-3 p-3 rounded-2xl bg-gradient-to-r from-gray-50 to-white hover:from-gray-100 hover:to-gray-50 transition-all duration-200 border border-gray-100 shadow-sm"                }
+                class="w-full flex items-center gap-3 p-3 rounded-2xl bg-gradient-to-r from-gray-50 to-white hover:from-gray-100 hover:to-gray-50 transition-all duration-200 border border-gray-100 shadow-sm"                
                 (click)="goToOrganizations()">
               <div class="w-10 h-10 bg-gradient-to-br from-indigo-100 to-purple-100 rounded-full flex items-center justify-center flex-shrink-0 ring-2 ring-white">
-                <span class="text-indigo-600 font-semibold text-sm">{{ orgInitials() }}</span>
+                <span class="text-indigo-600 font-semibold text-sm leading-none">{{ orgInitials() }}</span>
               </div>
               <div class="flex-1 text-left overflow-hidden min-w-0">
-                <p class="font-semibold text-gray-800 text-sm truncate">{{ activeOrg()?.name }}</p>
+                <p class="font-semibold text-gray-800 text-sm truncate leading-5">{{ activeOrg()?.name }}</p>
                 <p class="text-xs text-gray-500">{{ getRoleLabel(currentRole()) }}</p>
               </div>
               <i class="pi pi-chevron-right text-gray-300 text-xs"></i>
@@ -95,18 +96,20 @@ interface NavItem {
           }
           @for (item of navItems; track item.route) {
             @if (canShowNavItem(item)) {
-              <a
+                <a
                   pRipple
                   [routerLink]="item.route"
                   routerLinkActive="nav-active"
                   [routerLinkActiveOptions]="{ exact: item.route === '/dashboard' }"
-                  class="group flex items-center gap-3 px-3 py-2.5 rounded-2xl text-gray-500 hover:text-gray-700 hover:bg-gray-50 transition-all duration-200 w-full border border-transparent hover:border-gray-100"                  [class.justify-center]="sidebarCollapsed()"
+                  class="group flex items-center gap-3 px-3 py-2.5 rounded-2xl text-gray-500 hover:text-gray-700 hover:bg-gray-50 transition-all duration-200 w-full border border-transparent hover:border-gray-100"                  
+                  [class.justify-center]="sidebarCollapsed()"
                   [pTooltip]="sidebarCollapsed() ? item.label : ''"
                   tooltipPosition="right">
-                <div class="w-9 h-9 rounded-xl flex items-center justify-center transition-colors group-hover:bg-white group-hover:shadow-sm">                  <i [class]="'pi ' + item.icon + ' text-[15px]'"></i>
+                  <div class="w-9 h-9 rounded-xl flex items-center justify-center transition-colors group-hover:bg-white group-hover:shadow-sm flex-shrink-0">
+                    <i [class]="'pi ' + item.icon + ' text-[15px] leading-none'"></i>
                 </div>
                 @if (!sidebarCollapsed()) {
-                  <span class="font-medium text-sm">{{ item.label }}</span>
+                  <span class="font-medium text-sm leading-5">{{ item.label }}</span>
                 }
               </a>
             }
@@ -169,18 +172,19 @@ interface NavItem {
             <div class="relative">
               <button
                   pRipple
-                  class="flex items-center gap-3 p-1.5 pr-3 rounded-2xl hover:bg-gray-50 transition-colors border border-transparent hover:border-gray-100"                  
+                  type="button"
+                  class="flex items-center gap-3 p-1.5 pr-3 rounded-2xl hover:bg-gray-50 transition-colors border border-transparent hover:border-gray-100"                 
                   (click)="userMenu.toggle($event)">
-                <div class="w-9 h-9 bg-gradient-to-br from-indigo-400 to-purple-500 rounded-full flex items-center justify-center text-white font-semibold text-sm shadow-sm ring-2 ring-white">                  
+                <div class="w-9 h-9 bg-gradient-to-br from-indigo-400 to-purple-500 rounded-full flex items-center justify-center text-white font-semibold text-sm shadow-sm ring-2 ring-white leading-none">                  
                   {{ userInitials() }}
                 </div>
-                <div class="text-left hidden sm:block">
-                  <p class="text-sm font-medium text-gray-800">{{ userName() }}</p>
-                  <p class="text-[11px] text-gray-500 -mt-0.5">{{ userEmail() }}</p>
+                <div class="text-left hidden sm:block leading-tight">
+                  <p class="text-sm font-medium text-gray-800 leading-5">{{ userName() }}</p>
+                  <p class="text-[11px] text-gray-500">{{ userEmail() }}</p>
                 </div>
                 <i class="pi pi-chevron-down text-gray-400 text-[10px] hidden sm:block ml-1"></i>
               </button>
-              <p-menu #userMenu [model]="userMenuItems" [popup]="true"></p-menu>
+              <p-menu #userMenu [model]="userMenuItems" [popup]="true" appendTo="body"></p-menu>
             </div>
           </div>
         </header>
@@ -257,7 +261,6 @@ export class LayoutComponent {
   ];
 
   readonly userMenuItems: MenuItem[] = [
-    { label: 'Mi Perfil', icon: 'pi pi-user', command: () => this.router.navigate(['/settings/profile']) },
     { label: 'Organizaciones', icon: 'pi pi-building', command: () => this.goToOrganizations() },
     { separator: true },
     { label: 'Cerrar Sesión', icon: 'pi pi-sign-out', command: () => this.logout() }

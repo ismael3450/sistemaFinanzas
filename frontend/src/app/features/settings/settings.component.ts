@@ -268,6 +268,10 @@ import { DateAgoPipe } from '../../shared/pipes';
           <input pInputText formControlName="email" type="email" placeholder="correo@ejemplo.com" class="w-full">
         </div>
         <div class="form-group">
+          <label>Contraseña *</label>
+          <input pInputText formControlName="password" type="password" placeholder="Mínimo 8 caracteres" class="w-full">
+        </div>
+        <div class="form-group">
           <label>Rol *</label>
           <p-dropdown
               [options]="roleOptions"
@@ -360,6 +364,7 @@ export class SettingsComponent implements OnInit {
 
   inviteForm: FormGroup = this.fb.group({
     email: ['', [Validators.required, Validators.email]],
+    password: ['', [Validators.required, Validators.minLength(8)]],
     role: ['MEMBER', Validators.required]
   });
 

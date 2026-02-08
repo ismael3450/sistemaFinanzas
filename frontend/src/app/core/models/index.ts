@@ -101,6 +101,7 @@ export interface Member {
 
 export interface InviteMemberRequest {
   email: string;
+  password?: string;
   role?: Role;
 }
 
