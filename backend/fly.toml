@@ -1,6 +1,6 @@
+app = "fincontrolapi"
 # fly.toml - Configuración de Fly.io para FinControl API
-app = "fincontrol-api"
-primary_region = "mia"  # Miami - más cercano a El Salvador
+# NOTA: NO cambies "app" manualmente. Usa "fly launch" para configurarlo.
 
 [build]
 

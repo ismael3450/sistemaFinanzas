@@ -1,5 +1,5 @@
 export const environment = {
   production: true,
-  apiUrl: 'https://fincontrol-api.fly.dev/api/v1',
+  apiUrl: 'https://fincontrolapi.fly.dev/api/v1',
   wompiPublicKey: '',
 };
