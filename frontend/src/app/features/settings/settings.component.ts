@@ -349,7 +349,7 @@ export class SettingsComponent implements OnInit {
     name: ['', Validators.required],
     description: [''],
     currency: ['USD'],
-    timezone: ['America/New_York'],
+    timezone: ['America/El_Salvador'],
     fiscalYearStart: [1]
   });
 
@@ -389,6 +389,7 @@ export class SettingsComponent implements OnInit {
     { label: 'America/Denver (MST)', value: 'America/Denver' },
     { label: 'America/Los_Angeles (PST)', value: 'America/Los_Angeles' },
     { label: 'America/Mexico_City', value: 'America/Mexico_City' },
+    { label: 'America/El_Salvador (CST)', value: 'America/El_Salvador' },
     { label: 'America/Bogota', value: 'America/Bogota' },
     { label: 'America/Lima', value: 'America/Lima' },
     { label: 'America/Santiago', value: 'America/Santiago' },

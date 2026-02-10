@@ -146,7 +146,7 @@ export class OrganizationsComponent implements OnInit {
     name: ['', Validators.required],
     description: [''],
     currency: ['USD', Validators.required],
-    timezone: ['America/New_York']
+    timezone: ['America/El_Salvador']
   });
 
   // Options
@@ -166,6 +166,7 @@ export class OrganizationsComponent implements OnInit {
     { label: 'America/Denver (MST)', value: 'America/Denver' },
     { label: 'America/Los_Angeles (PST)', value: 'America/Los_Angeles' },
     { label: 'America/Mexico_City', value: 'America/Mexico_City' },
+    { label: 'America/El_Salvador (CST)', value: 'America/El_Salvador' },
     { label: 'America/Bogota', value: 'America/Bogota' },
     { label: 'America/Lima', value: 'America/Lima' },
     { label: 'America/Santiago', value: 'America/Santiago' },
@@ -178,7 +179,7 @@ export class OrganizationsComponent implements OnInit {
   }
 
   openDialog() {
-    this.form.reset({ currency: 'USD', timezone: 'America/New_York' });
+    this.form.reset({ currency: 'USD', timezone: 'America/El_Salvador' });
     this.dialogVisible = true;
   }
 

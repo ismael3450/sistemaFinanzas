@@ -117,7 +117,7 @@ interface NavItem {
                   [routerLink]="item.route"
                   routerLinkActive="nav-active"
                   [routerLinkActiveOptions]="{ exact: item.route === '/dashboard' }"
-                  class="group flex items-center gap-3 px-3 py-2.5 rounded-lg text-gray-500 hover:text-gray-700 hover:bg-gray-50 transition-all duration-200 w-full"
+                  class="group flex items-center gap-2 px-3 py-2.5 rounded-lg text-gray-500 hover:text-gray-700 hover:bg-gray-50 transition-all duration-200 w-full"
                   [class.justify-center]="sidebarCollapsed() && !isMobile()"
                   [pTooltip]="(sidebarCollapsed() && !isMobile()) ? item.label : ''"
                   tooltipPosition="right"
@@ -126,7 +126,7 @@ interface NavItem {
                   <i [class]="'pi ' + item.icon + ' text-[15px] leading-none'"></i>
                 </div>
                 @if (!sidebarCollapsed() || isMobile()) {
-                  <span class="font-medium text-sm leading-5">{{ item.label }}</span>
+                  <span class="font-medium text-[15px] leading-5">{{ item.label }}</span>
                 }
               </a>
             }
