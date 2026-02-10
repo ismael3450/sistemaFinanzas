@@ -205,8 +205,31 @@ export class TransactionsService {
       throw new BadRequestException('Cannot update voided transaction');
     }
 
-    // For simplicity, only allow updating description, reference, category, payment method
-    const updateData: Prisma.TransactionUncheckedUpdateInput = {};
+    const nextType = dto.type ?? existing.type;
+    const nextAmount = dto.amount !== undefined ? BigInt(dto.amount) : existing.amount;
+    const nextFromAccountId = 'fromAccountId' in dto
+        ? this.normalizeNullableId(dto.fromAccountId)
+        : existing.fromAccountId;
+    const nextToAccountId = 'toAccountId' in dto
+        ? this.normalizeNullableId(dto.toAccountId)
+        : existing.toAccountId;
+
+    this.validateTransactionAccounts({
+      type: nextType,
+      amount: Number(nextAmount),
+      fromAccountId: nextFromAccountId ?? undefined,
+      toAccountId: nextToAccountId ?? undefined,
+      transactionDate: dto.transactionDate ?? existing.transactionDate,
+    } as CreateTransactionDto);
+
+    const updateData: Prisma.TransactionUncheckedUpdateInput = {
+      ...(dto.type !== undefined && { type: dto.type }),
+      ...(dto.amount !== undefined && { amount: nextAmount }),
+      ...(dto.currency !== undefined && { currency: dto.currency || 'USD' }),
+      ...('fromAccountId' in dto && { fromAccountId: nextFromAccountId }),
+      ...('toAccountId' in dto && { toAccountId: nextToAccountId }),
+      ...(dto.transactionDate !== undefined && { transactionDate: dto.transactionDate }),
+    };
 
     if ('description' in dto) {
       updateData.description = this.normalizeNullableText(dto.description);
@@ -220,17 +243,33 @@ export class TransactionsService {
     if ('paymentMethodId' in dto) {
       updateData.paymentMethodId = this.normalizeNullableId(dto.paymentMethodId);
     }
-    const updated = await this.prisma.transaction.update({
-      where: { id: transactionId },
-      data: updateData,
-      include: {
-        category: true,
-        fromAccount: true,
-        toAccount: true,
-        paymentMethod: true,
-        createdBy: true,
-        attachments: true,
-      },
+    const updated = await this.prisma.$transaction(async (tx) => {
+      await this.applyBalanceEffect(tx, {
+        type: existing.type,
+        amount: existing.amount,
+        fromAccountId: existing.fromAccountId,
+        toAccountId: existing.toAccountId,
+      }, true);
+
+      await this.applyBalanceEffect(tx, {
+        type: nextType,
+        amount: nextAmount,
+        fromAccountId: nextFromAccountId,
+        toAccountId: nextToAccountId,
+      }, false);
+
+      return tx.transaction.update({
+        where: { id: transactionId },
+        data: updateData,
+        include: {
+          category: true,
+          fromAccount: true,
+          toAccount: true,
+          paymentMethod: true,
+          createdBy: true,
+          attachments: true,
+        },
+      });
     });
 
     await this.auditService.log({
@@ -455,6 +494,64 @@ export class TransactionsService {
           throw new BadRequestException('Cannot transfer to the same account');
         }
         break;
+    }
+  }
+
+  private async applyBalanceEffect(
+      tx: Prisma.TransactionClient,
+      txn: {
+        type: TransactionType;
+        amount: bigint;
+        fromAccountId?: string | null;
+        toAccountId?: string | null;
+      },
+      reverse: boolean,
+  ): Promise<void> {
+    if (txn.type === TransactionType.INCOME && txn.toAccountId) {
+      await tx.account.update({
+        where: { id: txn.toAccountId },
+        data: {
+          currentBalance: reverse
+              ? { decrement: txn.amount }
+              : { increment: txn.amount },
+        },
+      });
+      return;
+    }
+
+    if (txn.type === TransactionType.EXPENSE && txn.fromAccountId) {
+      await tx.account.update({
+        where: { id: txn.fromAccountId },
+        data: {
+          currentBalance: reverse
+              ? { increment: txn.amount }
+              : { decrement: txn.amount },
+        },
+      });
+      return;
+    }
+
+    if (txn.type === TransactionType.TRANSFER) {
+      if (txn.fromAccountId) {
+        await tx.account.update({
+          where: { id: txn.fromAccountId },
+          data: {
+            currentBalance: reverse
+                ? { increment: txn.amount }
+                : { decrement: txn.amount },
+          },
+        });
+      }
+      if (txn.toAccountId) {
+        await tx.account.update({
+          where: { id: txn.toAccountId },
+          data: {
+            currentBalance: reverse
+                ? { decrement: txn.amount }
+                : { increment: txn.amount },
+          },
+        });
+      }
     }
   }
 

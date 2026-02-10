@@ -672,6 +672,11 @@ export class TransactionFormComponent implements OnInit {
 
     const request = this.isEdit()
         ? this.transactionService.update(this.transactionId()!, {
+          type: formValue.type,
+          amount: Math.round(formValue.amount * 100),
+          transactionDate: formValue.transactionDate,
+          fromAccountId: formValue.fromAccountId || null,
+          toAccountId: formValue.toAccountId || null,
           description: normalizeNullableText(formValue.description),
           reference: normalizeNullableText(formValue.reference),
           categoryId: formValue.categoryId || null,
