@@ -277,17 +277,15 @@ import { LoadingComponent, EmptyStateComponent } from '../../../shared/component
                         [disabled]="txn.status === 'VOIDED'"
                         [routerLink]="['/transactions', txn.id, 'edit']">
                     </button>
-                    @if (txn.status !== 'VOIDED') {
-                      <button
-                          pButton
-                          pRipple
-                          type="button"
-                          icon="pi pi-ban"
-                          class="p-button-rounded p-button-text p-button-danger p-button-sm"
-                          pTooltip="Anular"
-                          (click)="confirmVoid(txn)">
-                      </button>
-                    }
+                    <button
+                        pButton
+                        pRipple
+                        type="button"
+                        icon="pi pi-trash"
+                        class="p-button-rounded p-button-text p-button-danger p-button-sm"
+                        pTooltip="Eliminar"
+                        (click)="confirmDelete(txn)">
+                    </button>
                   </div>
                 </td>
               </tr>
@@ -394,21 +392,21 @@ export class TransactionsListComponent implements OnInit {
     this.loadData();
   }
 
-  confirmVoid(txn: Transaction): void {
+  confirmDelete(txn: Transaction): void {
     this.confirmationService.confirm({
-      message: `¿Está seguro de anular la transacción "${txn.description || 'Sin descripción'}"?`,
-      header: 'Confirmar Anulación',
+      message: `¿Está seguro de eliminar la transacción "${txn.description || 'Sin descripción'}"? Esta acción no se puede deshacer.`,
+      header: 'Confirmar Eliminación',
       icon: 'pi pi-exclamation-triangle',
-      acceptLabel: 'Anular',
+      acceptLabel: 'Eliminar',
       rejectLabel: 'Cancelar',
       acceptButtonStyleClass: 'p-button-danger',
       accept: () => {
-        this.transactionService.void(txn.id, 'Anulada por el usuario').subscribe({
+        this.transactionService.delete(txn.id).subscribe({
           next: () => {
             this.messageService.add({
               severity: 'success',
               summary: 'Éxito',
-              detail: 'Transacción anulada correctamente'
+              detail: 'Transacción eliminada correctamente'
             });
           }
         });

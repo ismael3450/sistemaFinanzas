@@ -83,6 +83,15 @@ export class TransactionService {
     );
   }
 
+  delete(id: string): Observable<ApiResponse<Transaction>> {
+    return this.http.delete<ApiResponse<Transaction>>(`${this.getUrl()}/${id}`).pipe(
+        tap(() => {
+          this._transactions.update(txns => txns.filter(t => t.id !== id));
+          this._totalCount.update(count => Math.max(0, count - 1));
+        })
+    );
+  }
+
   void(id: string, reason: string): Observable<ApiResponse<Transaction>> {
     return this.http.post<ApiResponse<Transaction>>(`${this.getUrl()}/${id}/void`, { reason }).pipe(
       tap(response => {

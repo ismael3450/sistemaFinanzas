@@ -1,5 +1,5 @@
 import {
-  Controller, Get, Post, Body, Patch, Param, UseGuards, Query,
+  Controller, Get, Post, Body, Patch, Delete, Param, UseGuards, Query,
 } from '@nestjs/common';
 import { ApiTags, ApiOperation, ApiResponse, ApiBearerAuth, ApiParam } from '@nestjs/swagger';
 import { TransactionsService } from './transactions.service';
@@ -67,6 +67,19 @@ export class TransactionsController {
     @CurrentUser('id') userId: string,
   ): Promise<TransactionResponseDto> {
     return this.transactionsService.update(orgId, txnId, dto, userId);
+  }
+
+  @Delete(':transactionId')
+  @ApiOperation({ summary: 'Delete a transaction' })
+  @ApiParam({ name: 'organizationId', description: 'Organization ID' })
+  @ApiParam({ name: 'transactionId', description: 'Transaction ID' })
+  @ApiResponse({ status: 200, type: TransactionResponseDto })
+  async remove(
+      @Param('organizationId') orgId: string,
+      @Param('transactionId') txnId: string,
+      @CurrentUser('id') userId: string,
+  ): Promise<TransactionResponseDto> {
+    return this.transactionsService.remove(orgId, txnId, userId);
   }
 
   @Post(':transactionId/void')

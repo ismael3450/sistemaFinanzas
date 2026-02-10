@@ -247,6 +247,89 @@ export class TransactionsService {
     return this.mapToResponse(updated);
   }
 
+  async remove(
+      organizationId: string,
+      transactionId: string,
+      userId: string,
+  ): Promise<TransactionResponseDto> {
+    await this.checkPermission(organizationId, userId, [Role.OWNER, Role.ADMIN, Role.TREASURER]);
+
+    const existing = await this.prisma.transaction.findFirst({
+      where: { id: transactionId, organizationId },
+      include: {
+        category: true,
+        fromAccount: true,
+        toAccount: true,
+        paymentMethod: true,
+        createdBy: true,
+        attachments: true,
+      },
+    });
+
+    if (!existing) throw new NotFoundException('Transaction not found');
+
+    const amount = existing.amount;
+
+    const deleted = await this.prisma.$transaction(async (tx) => {
+      // If transaction was already voided, balances were previously reversed
+      if (existing.status !== TransactionStatus.VOIDED) {
+        if (existing.type === TransactionType.INCOME && existing.toAccountId) {
+          await tx.account.update({
+            where: { id: existing.toAccountId },
+            data: { currentBalance: { decrement: amount } },
+          });
+        } else if (existing.type === TransactionType.EXPENSE && existing.fromAccountId) {
+          await tx.account.update({
+            where: { id: existing.fromAccountId },
+            data: { currentBalance: { increment: amount } },
+          });
+        } else if (existing.type === TransactionType.TRANSFER) {
+          if (existing.fromAccountId) {
+            await tx.account.update({
+              where: { id: existing.fromAccountId },
+              data: { currentBalance: { increment: amount } },
+            });
+          }
+          if (existing.toAccountId) {
+            await tx.account.update({
+              where: { id: existing.toAccountId },
+              data: { currentBalance: { decrement: amount } },
+            });
+          }
+        }
+      }
+
+      return tx.transaction.delete({
+        where: { id: transactionId },
+        include: {
+          category: true,
+          fromAccount: true,
+          toAccount: true,
+          paymentMethod: true,
+          createdBy: true,
+          attachments: true,
+        },
+      });
+    });
+
+    await this.auditService.log({
+      action: 'DELETE',
+      module: 'transactions',
+      entityType: 'Transaction',
+      entityId: transactionId,
+      userId,
+      organizationId,
+      oldValues: {
+        status: existing.status,
+        amount: existing.amount.toString(),
+        type: existing.type,
+      },
+      newValues: null,
+    });
+
+    return this.mapToResponse(deleted);
+  }
+
   async voidTransaction(
     organizationId: string,
     transactionId: string,
