@@ -828,9 +828,10 @@ export class TransactionFormComponent implements OnInit {
       return '—';
     }
     const date = value instanceof Date ? value : new Date(value);
-    return new Intl.DateTimeFormat('es', {
+    return new Intl.DateTimeFormat('es-SV', {
       dateStyle: 'medium',
-      timeStyle: 'short'
+      timeStyle: 'short',
+      timeZone: 'America/El_Salvador'
     }).format(date);
   }
 

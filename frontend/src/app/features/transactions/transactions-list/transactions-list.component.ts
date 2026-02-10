@@ -199,8 +199,8 @@ import { LoadingComponent, EmptyStateComponent } from '../../../shared/component
               <tr class="group cursor-pointer" [routerLink]="['/transactions', txn.id]">
                 <td>
                   <div class="flex flex-col">
-                    <span class="font-medium text-gray-800">{{ txn.transactionDate | date:'dd MMM yyyy' }}</span>
-                    <span class="text-xs text-gray-400">{{ txn.transactionDate | date:'HH:mm' }}</span>
+                    <span class="font-medium text-gray-800">{{ txn.transactionDate | date:'dd MMM yyyy':'America/El_Salvador' }}</span>
+                    <span class="text-xs text-gray-400">{{ txn.transactionDate | date:'HH:mm':'America/El_Salvador' }}</span>
                   </div>
                 </td>
                 <td>

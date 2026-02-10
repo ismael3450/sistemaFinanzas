@@ -162,7 +162,7 @@ import { Transaction, PeriodSummary, TrendsReport } from '../../core/models';
             <ng-template pTemplate="body" let-txn>
               <tr class="cursor-pointer hover:bg-gray-50" [routerLink]="['/transactions', txn.id]">
                 <td>
-                  <span class="text-gray-600">{{ txn.transactionDate | date:'dd/MM/yyyy' }}</span>
+                  <span class="text-gray-600">{{ txn.transactionDate | date:'dd/MM/yyyy':'America/El_Salvador' }}</span>
                 </td>
                 <td>
                   <span class="font-medium">{{ txn.description || 'Sin descripción' }}</span>

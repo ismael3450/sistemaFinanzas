@@ -1,4 +1,5 @@
-import { ApplicationConfig, isDevMode, provideZoneChangeDetection } from '@angular/core';
+import { ApplicationConfig, isDevMode, LOCALE_ID, provideZoneChangeDetection } from '@angular/core';
+import { DATE_PIPE_DEFAULT_OPTIONS } from '@angular/common';
 import { provideRouter, withComponentInputBinding } from '@angular/router';
 import { provideHttpClient, withInterceptors } from '@angular/common/http';
 import { provideAnimationsAsync } from '@angular/platform-browser/animations/async';
@@ -18,6 +19,11 @@ export const appConfig: ApplicationConfig = {
     provideAnimationsAsync(),
     MessageService,
     ConfirmationService,
+    { provide: LOCALE_ID, useValue: 'es-SV' },
+    {
+      provide: DATE_PIPE_DEFAULT_OPTIONS,
+      useValue: { timezone: 'America/El_Salvador' }
+    },
     provideServiceWorker('ngsw-worker.js', {
       enabled: !isDevMode(),
       registrationStrategy: 'registerWhenStable:30000'

@@ -74,7 +74,17 @@ export class TransactionService {
   }
 
   update(id: string, data: UpdateTransactionRequest): Observable<ApiResponse<Transaction>> {
-    return this.http.patch<ApiResponse<Transaction>>(`${this.getUrl()}/${id}`, data).pipe(
+    const payload: UpdateTransactionRequest = {
+      ...data,
+      ...(data.amount !== undefined && { amount: Math.round(data.amount) }),
+      ...(data.transactionDate !== undefined && {
+        transactionDate: data.transactionDate instanceof Date
+            ? data.transactionDate
+            : new Date(data.transactionDate)
+      })
+    };
+
+    return this.http.patch<ApiResponse<Transaction>>(`${this.getUrl()}/${id}`, payload).pipe(
       tap(response => {
         this._transactions.update(txns => 
           txns.map(t => t.id === id ? response.data : t)
