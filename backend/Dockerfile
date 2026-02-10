@@ -23,6 +23,8 @@ RUN pnpm build
 # Limpiar source code (dejar solo dist y node_modules)
 RUN rm -rf src test scripts eslint.config.mjs tsconfig*.json nest-cli.json
 
+RUN chmod +x fly-release.sh
+
 EXPOSE 8080
 
-CMD ["sh", "-c", "pnpm prisma:migrate:prod && node dist/main"]
+CMD ["node", "dist/src/main.js"]

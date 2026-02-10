@@ -1,3 +1,5 @@
+process.env.TZ = process.env.TZ || 'America/El_Salvador';
+
 import { NestFactory } from '@nestjs/core';
 import {
   FastifyAdapter,

@@ -206,14 +206,23 @@ export class TransactionsService {
     }
 
     // For simplicity, only allow updating description, reference, category, payment method
+    const updateData: Prisma.TransactionUncheckedUpdateInput = {};
+
+    if ('description' in dto) {
+      updateData.description = this.normalizeNullableText(dto.description);
+    }
+    if ('reference' in dto) {
+      updateData.reference = this.normalizeNullableText(dto.reference);
+    }
+    if ('categoryId' in dto) {
+      updateData.categoryId = this.normalizeNullableId(dto.categoryId);
+    }
+    if ('paymentMethodId' in dto) {
+      updateData.paymentMethodId = this.normalizeNullableId(dto.paymentMethodId);
+    }
     const updated = await this.prisma.transaction.update({
       where: { id: transactionId },
-      data: {
-        description: dto.description,
-        reference: dto.reference,
-        categoryId: dto.categoryId,
-        paymentMethodId: dto.paymentMethodId,
-      },
+      data: updateData,
       include: {
         category: true,
         fromAccount: true,
@@ -374,6 +383,22 @@ export class TransactionsService {
     if (roles && !roles.includes(membership.role)) {
       throw new ForbiddenException('Insufficient permissions');
     }
+  }
+
+  private normalizeNullableText(value?: string | null): string | null | undefined {
+    if (value === undefined) return undefined;
+    if (value === null) return null;
+
+    const trimmedValue = value.trim();
+    return trimmedValue.length > 0 ? trimmedValue : null;
+  }
+
+  private normalizeNullableId(value?: string | null): string | null | undefined {
+    if (value === undefined) return undefined;
+    if (value === null) return null;
+
+    const trimmedValue = value.trim();
+    return trimmedValue.length > 0 ? trimmedValue : null;
   }
 
   private mapToResponse(txn: any): TransactionResponseDto {

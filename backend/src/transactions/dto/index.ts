@@ -1,4 +1,4 @@
-import { ApiProperty, ApiPropertyOptional, PartialType, OmitType } from '@nestjs/swagger';
+import { ApiProperty, ApiPropertyOptional, PartialType } from '@nestjs/swagger';
 import {
   IsNotEmpty, IsOptional, IsString, IsEnum, IsUUID, IsInt, Min, IsDate, IsArray,
 } from 'class-validator';
@@ -58,9 +58,7 @@ export class CreateTransactionDto {
   transactionDate: Date;
 }
 
-export class UpdateTransactionDto extends PartialType(
-  OmitType(CreateTransactionDto, ['type'] as const),
-) {}
+export class UpdateTransactionDto extends PartialType(CreateTransactionDto) {}
 
 export class VoidTransactionDto {
   @ApiProperty({ description: 'Reason for voiding the transaction' })
