@@ -664,14 +664,23 @@ export class TransactionFormComponent implements OnInit {
     this.saving.set(true);
 
     const formValue = this.form.value;
-    const data = {
-      ...formValue,
-      amount: Math.round(formValue.amount * 100)
+    const normalizeNullableText = (value: string | null | undefined): string | null => {
+      if (value === null || value === undefined) return null;
+      const trimmed = value.trim();
+      return trimmed.length > 0 ? trimmed : null;
     };
 
     const request = this.isEdit()
-        ? this.transactionService.update(this.transactionId()!, data)
-        : this.transactionService.create(data);
+        ? this.transactionService.update(this.transactionId()!, {
+          description: normalizeNullableText(formValue.description),
+          reference: normalizeNullableText(formValue.reference),
+          categoryId: formValue.categoryId || null,
+          paymentMethodId: formValue.paymentMethodId || null,
+        })
+        : this.transactionService.create({
+          ...formValue,
+          amount: Math.round(formValue.amount * 100),
+        });
 
     request.subscribe({
       next: (response) => {

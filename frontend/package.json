@@ -1,7 +1,7 @@
 {
   "name": "financial-control-app",
   "version": "1.0.0",
-  "description": "Sistema de Control Financiero Multiorganización - Frontend",
+  "description": "Sistema de Control Financiero Multiorganizaci\u00f3n - Frontend",
   "scripts": {
     "ng": "ng",
     "start": "ng serve",
@@ -28,7 +28,8 @@
     "primeng": "^17.18.0",
     "rxjs": "~7.8.0",
     "tslib": "^2.3.0",
-    "zone.js": "~0.15.0"
+    "zone.js": "~0.15.0",
+    "@angular/service-worker": "^19.0.0"
   },
   "devDependencies": {
     "@angular-devkit/build-angular": "^19.0.0",

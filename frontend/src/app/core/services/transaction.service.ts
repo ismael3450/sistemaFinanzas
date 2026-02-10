@@ -3,11 +3,12 @@ import { HttpClient, HttpParams } from '@angular/common/http';
 import { Observable, finalize, tap } from 'rxjs';
 import { environment } from '../../../environments/environment';
 import { 
-  Transaction, 
-  CreateTransactionRequest, 
+  Transaction,
+  CreateTransactionRequest,
+  UpdateTransactionRequest,
   TransactionFilter,
-  ApiResponse, 
-  PaginatedResponse 
+  ApiResponse,
+  PaginatedResponse
 } from '../models';
 import { OrganizationService } from './organization.service';
 
@@ -72,7 +73,7 @@ export class TransactionService {
     return this.http.get<ApiResponse<Transaction>>(`${this.getUrl()}/${id}`);
   }
 
-  update(id: string, data: Partial<CreateTransactionRequest>): Observable<ApiResponse<Transaction>> {
+  update(id: string, data: UpdateTransactionRequest): Observable<ApiResponse<Transaction>> {
     return this.http.patch<ApiResponse<Transaction>>(`${this.getUrl()}/${id}`, data).pipe(
       tap(response => {
         this._transactions.update(txns => 

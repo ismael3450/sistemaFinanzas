@@ -244,6 +244,19 @@ export interface CreateTransactionRequest {
   transactionDate: Date;
 }
 
+export interface UpdateTransactionRequest {
+  type?: TransactionType;
+  amount?: number;
+  currency?: string;
+  description?: string | null;
+  reference?: string | null;
+  categoryId?: string | null;
+  fromAccountId?: string | null;
+  toAccountId?: string | null;
+  paymentMethodId?: string | null;
+  transactionDate?: Date;
+}
+
 export interface TransactionFilter {
   type?: TransactionType;
   status?: TransactionStatus;
