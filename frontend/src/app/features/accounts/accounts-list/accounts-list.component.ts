@@ -31,6 +31,9 @@ import { MoneyPipe } from '../../../shared/pipes';
     <div class="page-container">
       <div class="page-header">
         <h1>Cuentas</h1>
+        <p class="text-sm text-gray-500 mt-1">
+          Administra dónde se mueve tu dinero: caja, bancos, tarjetas o cuentas de ahorro.
+        </p>
         <p-button icon="pi pi-plus" label="Nueva Cuenta" (onClick)="openDialog()"></p-button>
       </div>
 
@@ -141,6 +144,9 @@ import { MoneyPipe } from '../../../shared/pipes';
               appendTo="body"
               styleClass="w-full">
           </p-dropdown>
+          <small class="text-gray-500">
+            El tipo ayuda a identificar si es una cuenta bancaria, efectivo, tarjeta u otro origen de fondos.
+          </small>
         </div>
 
         <div class="form-group">

@@ -31,6 +31,9 @@ import { DateAgoPipe } from '../../shared/pipes';
     <div class="page-container">
       <div class="page-header">
         <h1>Configuración</h1>
+        <p class="text-sm text-gray-500 mt-1">
+          Ajusta los datos de tu organización, administra miembros y actualiza tu perfil personal.
+        </p>
       </div>
 
       <p-tabView [(activeIndex)]="activeTabIndex">

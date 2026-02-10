@@ -26,6 +26,9 @@ import { Category, CategoryType } from '../../../core/models';
     <div class="page-container">
       <div class="page-header">
         <h1>Categorías</h1>
+        <p class="text-sm text-gray-500 mt-1">
+          Define en qué se clasifica cada movimiento: ingreso, egreso o ambas opciones.
+        </p>
         <p-button icon="pi pi-plus" label="Nueva Categoría" (onClick)="openDialog()"></p-button>
       </div>
 
@@ -191,6 +194,9 @@ import { Category, CategoryType } from '../../../core/models';
         <div class="form-group">
           <label>Descripción</label>
           <input pInputText formControlName="description" class="w-full" placeholder="Descripción opcional">
+          <small class="text-gray-500">
+            Ejemplo: "Gastos recurrentes del hogar" o "Ingresos por servicios".
+          </small>
         </div>
 
         @if (parentCategory) {

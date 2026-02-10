@@ -72,6 +72,7 @@ import { LoadingComponent, EmptyStateComponent } from '../../../shared/component
           <div>
             <h2 class="text-sm font-semibold text-gray-800">Filtros de transacciones</h2>
             <p class="text-xs text-gray-500 mt-1">Busca movimientos por descripción, categoría o rango de fechas.</p>
+            <p class="text-xs text-gray-400 mt-1">Tip: combina filtros para encontrar más rápido gastos e ingresos específicos.</p>
           </div>
           <button
               class="text-sm text-gray-500 hover:text-gray-700 font-medium flex items-center gap-1.5 transition-colors self-start lg:self-center"
@@ -192,7 +193,7 @@ import { LoadingComponent, EmptyStateComponent } from '../../../shared/component
                 <th style="width: 100px">Tipo</th>
                 <th style="width: 100px" class="hidden sm:table-cell">Estado</th>
                 <th style="width: 130px" class="text-right">Monto</th>
-                <th style="width: 90px" class="text-center hidden sm:table-cell">Acciones</th>
+                <th style="width: 90px" class="text-center">Acciones</th>
               </tr>
             </ng-template>
             <ng-template pTemplate="body" let-txn>
@@ -265,8 +266,8 @@ import { LoadingComponent, EmptyStateComponent } from '../../../shared/component
                     {{ txn.type === 'INCOME' ? '+' : txn.type === 'EXPENSE' ? '-' : '' }}{{ txn.amount | money:txn.currency }}
                   </span>
                 </td>
-                <td class="text-center hidden sm:table-cell" (click)="$event.stopPropagation()">
-                  <div class="flex justify-center gap-1 opacity-0 group-hover:opacity-100 transition-opacity">
+                <td class="text-center" (click)="$event.stopPropagation()">
+                  <div class="flex justify-center gap-1 opacity-100 sm:opacity-0 sm:group-hover:opacity-100 transition-opacity">
                     <button
                         pButton
                         pRipple

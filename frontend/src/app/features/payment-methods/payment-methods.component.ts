@@ -31,6 +31,9 @@ import { PaymentMethod } from '../../core/models';
     <div class="page-container">
       <div class="page-header">
         <h1>Métodos de Pago</h1>
+          <p class="text-sm text-gray-500 mt-1">
+              Define cómo se registrará una transacción: efectivo, transferencia, tarjeta u otro medio.
+          </p>
         <p-button
             icon="pi pi-plus"
             label="Nuevo Método"
@@ -116,6 +119,9 @@ import { PaymentMethod } from '../../core/models';
         <div class="form-group">
           <label>Descripción</label>
           <input pInputText formControlName="description" class="w-full" placeholder="Opcional">
+            <small class="text-gray-500">
+                Ejemplo: "Transferencias desde banca en línea" o "Pagos con tarjeta corporativa".
+            </small>
         </div>
         <div class="flex justify-end gap-2 mt-6 pt-4 border-t">
           <p-button
